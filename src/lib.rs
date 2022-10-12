@@ -69,7 +69,7 @@ pub mod pallet {
         ItemNotFound,
 
         // Item already exists with the given account and item_type
-        ItemAlreadyExists,
+        ItemTypeAlreadyExists,
 
         // Item type is greater that 64
         ItemTypeExceedMax64,
@@ -82,7 +82,7 @@ pub mod pallet {
         fn dispatch_error(err: StorageError) -> DispatchResult {
             match err {
                 StorageError::NotFound => return Err(Error::<T>::ItemNotFound.into()),
-                StorageError::AlreadyExists => return Err(Error::<T>::ItemAlreadyExists.into()),
+                StorageError::AlreadyExists => return Err(Error::<T>::ItemTypeAlreadyExists.into()),
             }
         }
     }
@@ -110,8 +110,7 @@ pub mod pallet {
     // Dispatchable functions must be annotated with a weight and must return a DispatchResult.
     #[pallet::call]
     impl<T: Config> Pallet<T> {
-        /// Add a new item to the storage
-        /// with optional validity
+        /// Add a new item to the storage 
         #[pallet::weight(1_000)]
         pub fn add_item(
             origin: OriginFor<T>,
