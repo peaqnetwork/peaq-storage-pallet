@@ -31,9 +31,18 @@
 use frame_support::{traits::Get, weights::Weight};
 use sp_std::marker::PhantomData;
 
+/// Weight functions needed for peaq_pallet_storage
+pub trait WeightInfo {
+	fn add_item () -> Weight;
+	fn update_item() -> Weight;
+	fn  get_item() -> Weight;	
+}
+
+
+
 /// Weight functions for `peaq_pallet_storage`.
-pub struct WeightInfo<T>(PhantomData<T>);
-impl<T: frame_system::Config> peaq_pallet_storage::WeightInfo for WeightInfo<T> {
+pub struct SubstrateWeight<T>(PhantomData<T>);
+impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 	// Storage: PeaqStorage ItemStore (r:1 w:1)
 	fn add_item() -> Weight {
 		(639_153_000 as Weight)
