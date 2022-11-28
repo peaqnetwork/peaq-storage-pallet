@@ -3,7 +3,6 @@ use frame_support::{
 	parameter_types,	
 };
 use frame_system as system;
-use pallet_timestamp;
 use sp_core::{sr25519, H256};
 use sp_runtime::{
     testing::Header,
@@ -63,13 +62,6 @@ impl system::Config for Test {
 
 parameter_types! {
     pub const MinimumPeriod: u64 = 5;
-}
-
-impl pallet_timestamp::Config for Test {
-    type Moment = u64;
-    type OnTimestampSet = ();
-    type MinimumPeriod = MinimumPeriod;
-    type WeightInfo = ();
 }
 
 impl peaq_storage::Config for Test {
