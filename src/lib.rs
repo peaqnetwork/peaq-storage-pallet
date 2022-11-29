@@ -9,34 +9,35 @@ pub mod structs;
 pub mod enums;
 pub mod traits;
 
+#[cfg(test)]
+ mod mock;
 
+#[cfg(feature = "runtime-benchmarks")]
+  mod benchmarking;
 
-// #[cfg(test)]
-// mod mock;
-
-// #[cfg(test)]
-// mod tests;
-
-// #[cfg(feature = "runtime-benchmarks")]
-// mod benchmarking;
+pub mod weights;
+pub use weights::WeightInfo;
 
 // Re-export pallet items so that they can be accessed from the crate namespace.
 pub use pallet::*;
 
 #[frame_support::pallet]
 pub mod pallet {
+    use super::WeightInfo;
     use crate::enums::StorageError;
     use crate::traits::*;
     use frame_support::pallet_prelude::{*, ValueQuery};
     use frame_system::pallet_prelude::*;
     use sp_io::hashing::blake2_256;
     use sp_std::vec::Vec;
-
+    
     /// Configure the pallet by specifying the parameters and types on which it depends.
     #[pallet::config]
     pub trait Config: frame_system::Config {
         /// Because this pallet emits events, it depends on the runtime's definition of an event.
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
+        /// Weight information for extrinsics in this pallet.
+        type WeightInfo: WeightInfo;
     }
 
     // Pallets use events to inform users when important changes are made.
@@ -111,7 +112,7 @@ pub mod pallet {
     #[pallet::call]
     impl<T: Config> Pallet<T> {
         /// Add a new item to the storage 
-        #[pallet::weight(1_000)]
+        #[pallet::weight(T::WeightInfo::add_item())]
         pub fn add_item(
             origin: OriginFor<T>,
             item_type: Vec<u8>,
@@ -140,7 +141,7 @@ pub mod pallet {
         }
 
         /// Update an existing item in the storage
-        #[pallet::weight(1_000)]
+        #[pallet::weight(T::WeightInfo::update_item())]        
         pub fn update_item(
             origin: OriginFor<T>,
             item_type: Vec<u8>,
@@ -168,7 +169,7 @@ pub mod pallet {
         }
 
         /// Read storage item
-        #[pallet::weight(1_000)]
+        #[pallet::weight(T::WeightInfo::get_item())]
         pub fn get_item(
             origin: OriginFor<T>,
             item_type: Vec<u8>
