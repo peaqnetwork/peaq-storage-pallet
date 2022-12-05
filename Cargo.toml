@@ -23,7 +23,6 @@ sp-runtime = { default-features = false, git = 'https://github.com/peaqnetwork/s
 sp-core = { default-features = false, git = 'https://github.com/peaqnetwork/substrate', branch = 'peaq-polkadot-v0.9.29' }
 sp-io = { default-features = false, git = 'https://github.com/peaqnetwork/substrate', branch = 'peaq-polkadot-v0.9.29' }
 sp-std = { default-features = false, git = 'https://github.com/peaqnetwork/substrate', branch = 'peaq-polkadot-v0.9.29' }
-pallet-timestamp = { default-features = false, git = 'https://github.com/peaqnetwork/substrate', branch = 'peaq-polkadot-v0.9.29' }
 frame-benchmarking = { default-features = false, git = 'https://github.com/peaqnetwork/substrate', optional = true, branch = 'peaq-polkadot-v0.9.29' }
 
 [dev-dependencies]
@@ -42,6 +41,6 @@ std = [
     'sp-std/std',
 	'sp-io/std',
     'sp-core/std',
-	'pallet-timestamp/std',
+	
 ]
 try-runtime = ['frame-support/try-runtime']
