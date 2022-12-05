@@ -66,7 +66,7 @@ parameter_types! {
 
 impl peaq_storage::Config for Test {
     type Event=Event;
-    //type WeightInfo = peaq_storage::weights::SubstrateWeight<Test>;
+    type WeightInfo = peaq_storage::weights::SubstrateWeight<Test>;
 }
 
 // Build genesis storage according to the mock runtime.
