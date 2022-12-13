@@ -1,7 +1,5 @@
 use crate as peaq_storage;
-use frame_support::{
-	parameter_types,	
-};
+use frame_support::parameter_types;
 use frame_system as system;
 use sp_core::{sr25519, H256};
 use sp_runtime::{
@@ -12,7 +10,6 @@ use sp_runtime::{
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
 
-
 // Configure a mock runtime to test the pallet.
 frame_support::construct_runtime!(
     pub enum Test where
@@ -20,11 +17,10 @@ frame_support::construct_runtime!(
         NodeBlock = Block,
         UncheckedExtrinsic = UncheckedExtrinsic,
     {
-        System: frame_system::{Pallet, Call, Config, Storage, Event<T>},        
-        PeaqStorage: peaq_storage::{Pallet, Call, Storage, Event<T>},        
+        System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
+        PeaqStorage: peaq_storage::{Pallet, Call, Storage, Event<T>},
     }
 );
-
 
 parameter_types! {
     pub const BlockHashCount: u64 = 250;
@@ -65,7 +61,7 @@ parameter_types! {
 }
 
 impl peaq_storage::Config for Test {
-    type Event=Event;
+    type Event = Event;
     type WeightInfo = peaq_storage::weights::SubstrateWeight<Test>;
 }
 

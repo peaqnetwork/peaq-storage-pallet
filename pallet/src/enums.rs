@@ -1,4 +1,4 @@
 pub enum StorageError {
-	NotFound,
-	AlreadyExists,
+    NotFound,
+    AlreadyExists,
 }

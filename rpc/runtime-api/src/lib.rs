@@ -1,14 +1,17 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+#![cfg_attr(not(feature = "std"), no_std)]
+// The `too_many_arguments` warning originates from `decl_runtime_apis` macro.
+#![allow(clippy::too_many_arguments)]
+// The `unnecessary_mut_passed` warning originates from `decl_runtime_apis` macro.
+#![allow(clippy::unnecessary_mut_passed)]
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+use codec::Codec;
+use sp_std::vec::Vec;
+// use peaq_pallet_storage::structs::UserAttribute;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+sp_api::decl_runtime_apis! {
+    pub trait PeaqStorageApi<AccountId> where
+        AccountId: Codec,
+        {
+            fn read(did_account: AccountId, item_type: Vec<u8>) -> Option<Vec<u8>>;
+        }
 }
