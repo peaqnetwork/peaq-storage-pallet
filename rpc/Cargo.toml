@@ -1,0 +1,28 @@
+[package]
+name = "peaq-pallet-storage-rpc"
+version = "0.0.1"
+description = "peaq storage pallet rpc interface."
+edition = "2021"
+authors = ['peaq network <https://github.com/peaqnetwork>']
+homepage = 'https://peaq.network/'
+license = 'Apache-2.0'
+publish = false
+repository = 'https://github.com/peaqnetwork/peaq-pallet-storage/'
+
+
+[dependencies]
+codec = { package = "parity-scale-codec", version = "3.0.0" }
+jsonrpc-core = "18.0.0"
+jsonrpc-core-client = "18.0.0"
+jsonrpc-derive = "18.0.0"
+serde = "1.0.136"
+
+
+sp-api = { git = "https://github.com/peaqnetwork/substrate", branch = "peaq-polkadot-v0.9.29" }
+sp-blockchain = { git = "https://github.com/peaqnetwork/substrate", branch = "peaq-polkadot-v0.9.29" }
+sp-core = { git = "https://github.com/peaqnetwork/substrate", branch = "peaq-polkadot-v0.9.29" }
+sp-rpc = { git = "https://github.com/peaqnetwork/substrate", branch = "peaq-polkadot-v0.9.29" }
+sp-runtime = { git = "https://github.com/peaqnetwork/substrate", branch = "peaq-polkadot-v0.9.29" }
+peaq-pallet-storage-runtime-api = { version = "0.0.1", path = "./runtime-api" }
+peaq-pallet-storage = { version = "0.1.1", path = "../pallet/" }
+jsonrpsee = { git = "https://github.com/peaqnetwork/jsonrpsee", branch = "peaq-v0.15.1", features = ["server", "macros"] }
