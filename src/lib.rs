@@ -220,7 +220,8 @@ pub mod pallet {
 
         // SBP M3 Review: It is strongly not recommended to have dispatchable function to
         // read item from storage. We can either use getter function or expose RPC end point
-        /// Read storage item
+        // Read storage item. Please refer this https://docs.substrate.io/build/runtime-storage/#declaring-storage-items
+        // to get better understanding of declaring storage items in Substarte pallet.
         #[pallet::weight(T::WeightInfo::get_item())]
         pub fn get_item(
             origin: OriginFor<T>,
