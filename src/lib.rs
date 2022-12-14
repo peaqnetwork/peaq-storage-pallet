@@ -220,7 +220,15 @@ pub mod pallet {
 
         // SBP M3 Review: It is strongly not recommended to have dispatchable function to
         // read item from storage. We can either use getter function or expose RPC end point
-        // Read storage item. For example: In this case, we can call `Self::item_of(id)` .
+        // Read storage item.
+        // For example: If we have a storage map: 
+	       // ```
+        // #[pallet::storage]
+	       // #[pallet::getter(fn product_information)]
+	       // pub type ProductInformation<T: Config> = StorageMap<_, Blake2_128Concat, T::Hash, Product<T::AccountId, T::Hash>>;
+	       // ```
+	       // We can read the item by caling `Self::product_information(id)`. 
+ 	      //      
         // Please refer this https://docs.substrate.io/build/runtime-storage/#declaring-storage-items
         // to get better understanding of declaring storage items in Substarte pallet.
         #[pallet::weight(T::WeightInfo::get_item())]
