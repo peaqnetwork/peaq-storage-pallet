@@ -13,7 +13,7 @@ use sp_blockchain::HeaderBackend;
 use sp_runtime::{generic::BlockId, traits::Block as BlockT};
 
 #[rpc(client, server)]
-pub trait PeaqStorageApi<BlockHash, AccountId, BlockNumber, Moment> {
+pub trait PeaqStorageApi<BlockHash, AccountId> {
     #[method(name = "peaqstorage_readAttribute")]
     fn read_attribute(
         &self,
@@ -52,16 +52,14 @@ impl From<Error> for i32 {
 }
 
 #[async_trait]
-impl<C, Block, AccountId, BlockNumber, Moment>
-    PeaqStorageApiServer<<Block as BlockT>::Hash, AccountId, BlockNumber, Moment>
+impl<C, Block, AccountId>
+    PeaqStorageApiServer<<Block as BlockT>::Hash, AccountId>
     for PeaqStorage<C, Block>
 where
     Block: BlockT,
     C: Send + Sync + 'static + ProvideRuntimeApi<Block> + HeaderBackend<Block>,
     C::Api: PeaqStorageRuntimeApi<Block, AccountId>,
-    AccountId: Codec,
-    BlockNumber: Codec,
-    Moment: Codec,
+    AccountId: Codec
 {
     fn read_attribute(
         &self,
