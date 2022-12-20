@@ -29,36 +29,34 @@
 #![allow(unused_parens)]
 #![allow(unused_imports)]
 
-use frame_support::{traits::Get, weights::Weight};
+use frame_support::{traits::Get, weights::{Weight}};
 use sp_std::marker::PhantomData;
 
-/// Weight functions needed for peaq_pallet_storage
+/// Weight functions needed for peaq_pallet_storage.
 pub trait WeightInfo {
-	fn add_item () -> Weight;
+	fn add_item() -> Weight;
 	fn update_item() -> Weight;
-	fn  get_item() -> Weight;	
+	fn get_item() -> Weight;	
 }
-
-
 
 /// Weight functions for `peaq_pallet_storage`.
 pub struct SubstrateWeight<T>(PhantomData<T>);
 impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 	// Storage: PeaqStorage ItemStore (r:1 w:1)
 	fn add_item() -> Weight {
-		(23_014_000 as Weight)
-			.saturating_add(T::DbWeight::get().reads(1 as Weight))
-			.saturating_add(T::DbWeight::get().writes(1 as Weight))
+		Weight::from_ref_time(23_014_000 as u64)
+			.saturating_add(T::DbWeight::get().reads(1 as u64))
+			.saturating_add(T::DbWeight::get().writes(1 as u64))
 	}
 	// Storage: PeaqStorage ItemStore (r:1 w:1)
 	fn update_item() -> Weight {
-		(25_127_000 as Weight)
-			.saturating_add(T::DbWeight::get().reads(1 as Weight))
-			.saturating_add(T::DbWeight::get().writes(1 as Weight))
+		Weight::from_ref_time(25_127_000 as u64)
+			.saturating_add(T::DbWeight::get().reads(1 as u64))
+			.saturating_add(T::DbWeight::get().writes(1 as u64))
 	}
 	// Storage: PeaqStorage ItemStore (r:1 w:0)
 	fn get_item() -> Weight {
-		(23_725_000 as Weight)
-			.saturating_add(T::DbWeight::get().reads(1 as Weight))
+		Weight::from_ref_time(23_725_000 as u64)
+			.saturating_add(T::DbWeight::get().reads(1 as u64))
 	}
 }
