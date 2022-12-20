@@ -15,8 +15,14 @@ const CALLER_ACCOUNT_STR: &str = "Iredia1";
 const ITEM_TYPE_BYTES: &[u8; 4] = b"test";
 const ITEM_BYTES: &[u8; 9] = b"123456789";
 
+// SBP M3 Review: For benchmarking, we should try to cover worst case scenario
+// For example: Here we can use maximum length of string for item type and item
+
 benchmarks! {
     add_item {
+        // SBP M3 Review: Let's use Substrate way of benchmarking account id
+        // let caller: T::AccountId = whitelisted_caller();
+        // please see https://github.com/paritytech/substrate/blob/ea3ca3f757ff9d9559665719a77da81f4cf0f0ce/bin/node-template/pallets/template/src/benchmarking.rs#L13
         let caller: T::AccountId =  account(CALLER_ACCOUNT_STR,0, 0);
         
     }: _(RawOrigin::Signed(caller.clone()), ITEM_TYPE_BYTES.to_vec(), ITEM_BYTES.to_vec())
