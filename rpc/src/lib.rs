@@ -2,25 +2,38 @@ use std::convert::From;
 use std::sync::Arc;
 
 use codec::Codec;
+use codec::{Decode, Encode};
 use jsonrpsee::{
     core::{async_trait, Error as JsonRpseeError, RpcResult},
     proc_macros::rpc,
     types::error::{CallError, ErrorObject},
 };
 pub use peaq_pallet_storage_runtime_api::PeaqStorageApi as PeaqStorageRuntimeApi;
+use serde::{Deserialize, Serialize};
 use sp_api::ProvideRuntimeApi;
 use sp_blockchain::HeaderBackend;
+use sp_core::Bytes;
 use sp_runtime::{generic::BlockId, traits::Block as BlockT};
 
+#[derive(Clone, Encode, Decode, Serialize, Deserialize)]
+pub struct StorageRpcResult {
+    pub item: Bytes,
+}
+
+impl From<Vec<u8>> for StorageRpcResult {
+    fn from(item: Vec<u8>) -> Self {
+        StorageRpcResult { item: item.into() }
+    }
+}
 #[rpc(client, server)]
 pub trait PeaqStorageApi<BlockHash, AccountId> {
     #[method(name = "peaqstorage_readAttribute")]
     fn read_attribute(
         &self,
         did_account: AccountId,
-        item_type: Vec<u8>,
+        item_type: Bytes,
         at: Option<BlockHash>,
-    ) -> RpcResult<Option<Vec<u8>>>;
+    ) -> RpcResult<Option<StorageRpcResult>>;
 }
 
 /// A struct that implements the [`PeaqStorageApi`].
@@ -52,28 +65,27 @@ impl From<Error> for i32 {
 }
 
 #[async_trait]
-impl<C, Block, AccountId>
-    PeaqStorageApiServer<<Block as BlockT>::Hash, AccountId>
+impl<C, Block, AccountId> PeaqStorageApiServer<<Block as BlockT>::Hash, AccountId>
     for PeaqStorage<C, Block>
 where
     Block: BlockT,
     C: Send + Sync + 'static + ProvideRuntimeApi<Block> + HeaderBackend<Block>,
     C::Api: PeaqStorageRuntimeApi<Block, AccountId>,
-    AccountId: Codec
+    AccountId: Codec,
 {
     fn read_attribute(
         &self,
         did_account: AccountId,
-        item_type: Vec<u8>,
+        item_type: Bytes,
         at: Option<<Block as BlockT>::Hash>,
-    ) -> RpcResult<Option<Vec<u8>>> {
+    ) -> RpcResult<Option<StorageRpcResult>> {
         let api = self.client.runtime_api();
         let at = BlockId::hash(at.unwrap_or(
             // If the block hash is not supplied assume the best block.
             self.client.info().best_hash,
         ));
-        api.read(&at, did_account, item_type)
-            .map(|o| o.map(|item| item))
+        api.read(&at, did_account, item_type.to_vec())
+            .map(|o| o.map(|item| StorageRpcResult::from(item)))
             .map_err(|e| {
                 JsonRpseeError::Call(CallError::Custom(ErrorObject::owned(
                     Error::RuntimeError.into(),
