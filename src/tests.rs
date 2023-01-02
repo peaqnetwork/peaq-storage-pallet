@@ -1,8 +1,31 @@
 use crate::{mock::*, Error};
 use frame_support::{assert_noop, assert_ok};
 
+//Test to add an item
 #[test]
-fn add_item_test(){
+fn add_item_test_ok(){
+    new_test_ext().execute_with(|| {
+        System::set_block_number(1);
+        
+        let acct="Iredia";
+        let origin = account_key(acct);
+        let item_type = b"itemType";
+        let item = b"item";        
+        
+        assert_ok!(
+            PeaqStorage::add_item(
+                Origin::signed(origin),
+                item_type.to_vec(),
+                item.to_vec()
+            )
+        );       
+        
+    });
+}
+
+//Test to add a duplicate item
+#[test]
+fn add_item_duplicate_test(){
     new_test_ext().execute_with(|| {
         System::set_block_number(1);
         
@@ -10,9 +33,8 @@ fn add_item_test(){
         let origin = account_key(acct);
         let item_type = b"itemType";
         let item = b"item";
-        let mut tmp = String::from("a").repeat(65);            
-
-        //test to add an item
+        
+        //Add an item
         assert_ok!(
             PeaqStorage::add_item(
                 Origin::signed(origin),
@@ -21,7 +43,7 @@ fn add_item_test(){
             )
         );       
 
-        //test to add duplicate  item
+        //Add the same item again
         assert_noop!(
             PeaqStorage::add_item(
             Origin::signed(origin),
@@ -30,23 +52,46 @@ fn add_item_test(){
         ),
         Error::<Test>::ItemTypeAlreadyExists
     );
-    
-    let item_type = tmp.as_bytes();    
-    //Test for item type with item type's length exceed maximum limit
-    assert_noop!(
-        PeaqStorage::add_item(
-            Origin::signed(origin), 
-            item_type.to_vec(), 
-            item.to_vec()
+        
+    });
+}
+
+//Test to add item with item type length exceed maximum limit
+#[test]
+fn add_item_type_length_exceeds_limit_test(){
+    new_test_ext().execute_with(|| {
+        System::set_block_number(1);
+        
+        let acct="Iredia";
+        let origin = account_key(acct);
+        let item = b"item";
+        let tmp = String::from("a").repeat(65);               
+        let item_type = tmp.as_bytes();    
+        
+        assert_noop!(
+            PeaqStorage::add_item(
+                Origin::signed(origin), 
+                item_type.to_vec(), 
+                item.to_vec()
         ),
         Error::<Test>::ItemTypeExceedMax64
-    );
+    );      
+        
+    });
+}
 
-    let item_type = b"itemType1";  
-    tmp = tmp.repeat(2);  
-    let item= tmp.as_bytes();
-
-    //Test for item with item's length exceed maximum limit
+//Test to add an item with item length exceed maximum limit
+#[test]
+fn add_item_length_exceeds_limit_test(){
+    new_test_ext().execute_with(|| {
+        System::set_block_number(1);
+        
+        let acct="Iredia";
+        let origin = account_key(acct);
+        let item_type = b"itemType";
+        let tmp = String::from("a").repeat(129);
+        let item = tmp.as_bytes();
+        
     assert_noop!(
         PeaqStorage::add_item(
             Origin::signed(origin), 
@@ -59,19 +104,18 @@ fn add_item_test(){
     });
 }
 
+//Test to update an item
 #[test]
-fn update_item_test() {
+fn update_item_test_ok() {
     new_test_ext().execute_with(|| {
         System::set_block_number(1);     
 
         let acct="Iredia";
-        let acct2 = "Fake";
         let origin = account_key(acct);
-        let fake_origin = account_key(acct2);
         let item_type = b"itemType";
-        let item = b"item";
-        let tmp = String::from("a").repeat(129);
-
+        let  item = b"item";
+        
+        //Add an item
         assert_ok!(
             PeaqStorage::add_item(
                 Origin::signed(origin),
@@ -80,39 +124,63 @@ fn update_item_test() {
             )
         );       
 
-        //Test to update an item
+        //update item
         assert_ok!(
             PeaqStorage::update_item(
                 Origin::signed(origin), 
                 item_type.to_vec(), 
-                item.to_vec()
+                b"new_item".to_vec()
             )
         );
+        
+    });
+}
 
-        //Test to update a not exisitngs item
+//Test to update a non existing item
+#[test]
+fn update_non_existing_item_test() {
+    new_test_ext().execute_with(|| {
+        System::set_block_number(1);     
+
+        let acct="Iredia";
+        let origin = account_key(acct);
+                
         assert_noop!(
             PeaqStorage::update_item(
                 Origin::signed(origin), 
                 b"new_item_type".to_vec(),
-                item.to_vec()
+                b"new_item".to_vec()
             ),
             Error::<Test>::ItemNotFound
 
-        );
+        );              
 
-        //Test to update another owner's item
-        assert_noop!(
-            PeaqStorage::update_item(
-                Origin::signed(fake_origin), 
-                item_type.to_vec(), 
+    });
+}
+
+#[test]
+fn update_item_with_item_length_exceed_limit_test() {
+    new_test_ext().execute_with(|| {
+        System::set_block_number(1);     
+
+        let acct="Iredia";
+        let origin = account_key(acct);
+        let item_type = b"itemType";
+        let item = b"item";
+        let tmp = String::from("a").repeat(129);
+
+        //Add an item
+        assert_ok!(
+            PeaqStorage::add_item(
+                Origin::signed(origin),
+                item_type.to_vec(),
                 item.to_vec()
-            ),
-            Error::<Test>::ItemNotFound
-        );
+            )
+        );       
 
         let item=tmp.as_bytes();
 
-        //Test to update an item with an invalid item
+        //Update the item with item length exceed the limit
         assert_noop!(
             PeaqStorage::update_item(
                 Origin::signed(origin),
@@ -127,7 +195,107 @@ fn update_item_test() {
 }
 
 #[test]
-fn get_item_test() {
+//Test to update an other owner's item
+fn update_other_owner_item_test() {
+    new_test_ext().execute_with(|| {
+        System::set_block_number(1);     
+
+        let acct="Iredia";
+        let acct2 = "Fake";
+        let origin = account_key(acct);
+        let fake_origin = account_key(acct2);
+        let item_type = b"itemType";
+        let item = b"item";
+        
+        //Add an item with user Iredia
+        assert_ok!(
+            PeaqStorage::add_item(
+                Origin::signed(origin),
+                item_type.to_vec(),
+                item.to_vec()
+            )
+        );
+
+        //Update the item with fake owner
+        assert_noop!(
+            PeaqStorage::update_item(
+                Origin::signed(fake_origin), 
+                item_type.to_vec(), 
+                item.to_vec()
+            ),
+            Error::<Test>::ItemNotFound
+        );               
+
+    });
+}
+
+//Test to get an item
+#[test]
+fn get_item_test_ok() {
+    new_test_ext().execute_with(|| {
+        System::set_block_number(1);     
+
+        let acct="Iredia";
+        let origin = account_key(acct);
+        let item_type = b"itemType";
+        let item = b"item";
+        
+        //Add an item
+        assert_ok!(
+            PeaqStorage::add_item(
+                Origin::signed(origin),
+                item_type.to_vec(),
+                item.to_vec()
+            )
+        );       
+
+        //Get the same item
+        assert_ok!(
+            PeaqStorage::get_item(
+                Origin::signed(origin),
+                item_type.to_vec()                
+            )
+
+        );     
+
+                
+    });
+}
+
+//Test to get a non existing item
+#[test]
+fn get_non_existing_item_test() {
+    new_test_ext().execute_with(|| {
+        System::set_block_number(1);     
+
+        let acct="Iredia";
+        let origin = account_key(acct);
+        let item_type = b"itemType";
+        let item = b"item";
+        
+        assert_ok!(
+            PeaqStorage::add_item(
+                Origin::signed(origin),
+                item_type.to_vec(),
+                item.to_vec()
+            )
+        );     
+              
+        //Get a non existing item
+        assert_noop!(
+            PeaqStorage::get_item(
+                Origin::signed(origin),
+                b"new_item_type".to_vec()
+        ),
+        Error::<Test>::ItemNotFound
+        );
+                
+    });
+}
+
+//Test to get another owner item
+#[test]
+fn get_other_owner_item_test() {
     new_test_ext().execute_with(|| {
         System::set_block_number(1);     
 
@@ -138,6 +306,7 @@ fn get_item_test() {
         let item_type = b"itemType";
         let item = b"item";
         
+        //Add an item 
         assert_ok!(
             PeaqStorage::add_item(
                 Origin::signed(origin),
@@ -146,25 +315,7 @@ fn get_item_test() {
             )
         );       
 
-        //Test to get an item
-        assert_ok!(
-            PeaqStorage::get_item(
-                Origin::signed(origin),
-                item_type.to_vec()                
-            )
-
-        );
-        
-        //Test to get a non existing item
-        assert_noop!(
-            PeaqStorage::get_item(
-                Origin::signed(origin),
-                b"new_item_type".to_vec()
-        ),
-        Error::<Test>::ItemNotFound
-        );
-
-        //Test to get anotehr owner's item
+        //Get anotehr owner's item
         assert_noop!(
             PeaqStorage::get_item(
                 Origin::signed(fake_origin),
