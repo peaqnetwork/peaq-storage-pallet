@@ -1,14 +1,16 @@
 use crate::{mock::*, Error};
 use frame_support::{assert_noop, assert_ok};
 
+const ACCT :&str="Iredia";
+const ACCT2 :&str = "Fake";
+
 //Test to add an item
 #[test]
 fn add_item_test_ok(){
     new_test_ext().execute_with(|| {
         System::set_block_number(1);
         
-        let acct="Iredia";
-        let origin = account_key(acct);
+        let origin = account_key(ACCT);
         let item_type = b"itemType";
         let item = b"item";        
         
@@ -29,8 +31,7 @@ fn add_item_duplicate_test(){
     new_test_ext().execute_with(|| {
         System::set_block_number(1);
         
-        let acct="Iredia";
-        let origin = account_key(acct);
+        let origin = account_key(ACCT);
         let item_type = b"itemType";
         let item = b"item";
         
@@ -62,8 +63,7 @@ fn add_item_type_length_exceeds_limit_test(){
     new_test_ext().execute_with(|| {
         System::set_block_number(1);
         
-        let acct="Iredia";
-        let origin = account_key(acct);
+        let origin = account_key(ACCT);
         let item = b"item";
         let tmp = String::from("a").repeat(65);               
         let item_type = tmp.as_bytes();    
@@ -83,11 +83,10 @@ fn add_item_type_length_exceeds_limit_test(){
 //Test to add an item with item length exceed maximum limit
 #[test]
 fn add_item_length_exceeds_limit_test(){
-    new_test_ext().execute_with(|| {
+    new_test_ext().execute_with(||{
         System::set_block_number(1);
         
-        let acct="Iredia";
-        let origin = account_key(acct);
+        let origin = account_key(ACCT);
         let item_type = b"itemType";
         let tmp = String::from("a").repeat(129);
         let item = tmp.as_bytes();
@@ -110,8 +109,7 @@ fn update_item_test_ok() {
     new_test_ext().execute_with(|| {
         System::set_block_number(1);     
 
-        let acct="Iredia";
-        let origin = account_key(acct);
+        let origin = account_key(ACCT);
         let item_type = b"itemType";
         let  item = b"item";
         
@@ -142,8 +140,7 @@ fn update_non_existing_item_test() {
     new_test_ext().execute_with(|| {
         System::set_block_number(1);     
 
-        let acct="Iredia";
-        let origin = account_key(acct);
+        let origin = account_key(ACCT);
                 
         assert_noop!(
             PeaqStorage::update_item(
@@ -163,8 +160,7 @@ fn update_item_with_item_length_exceed_limit_test() {
     new_test_ext().execute_with(|| {
         System::set_block_number(1);     
 
-        let acct="Iredia";
-        let origin = account_key(acct);
+        let origin = account_key(ACCT);
         let item_type = b"itemType";
         let item = b"item";
         let tmp = String::from("a").repeat(129);
@@ -200,10 +196,9 @@ fn update_other_owner_item_test() {
     new_test_ext().execute_with(|| {
         System::set_block_number(1);     
 
-        let acct="Iredia";
-        let acct2 = "Fake";
-        let origin = account_key(acct);
-        let fake_origin = account_key(acct2);
+        
+        let origin = account_key(ACCT);
+        let fake_origin = account_key(ACCT2);
         let item_type = b"itemType";
         let item = b"item";
         
@@ -235,8 +230,7 @@ fn get_item_test_ok() {
     new_test_ext().execute_with(|| {
         System::set_block_number(1);     
 
-        let acct="Iredia";
-        let origin = account_key(acct);
+        let origin = account_key(ACCT);
         let item_type = b"itemType";
         let item = b"item";
         
@@ -268,8 +262,7 @@ fn get_non_existing_item_test() {
     new_test_ext().execute_with(|| {
         System::set_block_number(1);     
 
-        let acct="Iredia";
-        let origin = account_key(acct);
+        let origin = account_key(ACCT);
         let item_type = b"itemType";
         let item = b"item";
         
@@ -299,10 +292,8 @@ fn get_other_owner_item_test() {
     new_test_ext().execute_with(|| {
         System::set_block_number(1);     
 
-        let acct="Iredia";
-        let acct2 = "fake";
-        let origin = account_key(acct);
-        let fake_origin = account_key(acct2);
+        let origin = account_key(ACCT);
+        let fake_origin = account_key(ACCT2);
         let item_type = b"itemType";
         let item = b"item";
         
