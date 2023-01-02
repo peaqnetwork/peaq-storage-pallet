@@ -3,6 +3,8 @@ use frame_support::{assert_noop, assert_ok};
 
 const ACCT :&str="Iredia";
 const ACCT2 :&str = "Fake";
+const ITEM_TYPE : &[u8; 8] = b"itemType";
+const ITEM :&[u8;4]= b"item";
 
 //Test to add an item
 #[test]
@@ -11,14 +13,12 @@ fn add_item_test_ok(){
         System::set_block_number(1);
         
         let origin = account_key(ACCT);
-        let item_type = b"itemType";
-        let item = b"item";        
-        
+                
         assert_ok!(
             PeaqStorage::add_item(
                 Origin::signed(origin),
-                item_type.to_vec(),
-                item.to_vec()
+                ITEM_TYPE.to_vec(),
+                ITEM.to_vec()
             )
         );       
         
@@ -32,15 +32,13 @@ fn add_item_duplicate_test(){
         System::set_block_number(1);
         
         let origin = account_key(ACCT);
-        let item_type = b"itemType";
-        let item = b"item";
         
         //Add an item
         assert_ok!(
             PeaqStorage::add_item(
                 Origin::signed(origin),
-                item_type.to_vec(),
-                item.to_vec()
+                ITEM_TYPE.to_vec(),
+                ITEM.to_vec()
             )
         );       
 
@@ -48,8 +46,8 @@ fn add_item_duplicate_test(){
         assert_noop!(
             PeaqStorage::add_item(
             Origin::signed(origin),
-            item_type.to_vec(),
-            item.to_vec()            
+            ITEM_TYPE.to_vec(),
+            ITEM.to_vec()      
         ),
         Error::<Test>::ItemTypeAlreadyExists
     );
@@ -64,15 +62,13 @@ fn add_item_type_length_exceeds_limit_test(){
         System::set_block_number(1);
         
         let origin = account_key(ACCT);
-        let item = b"item";
-        let tmp = String::from("a").repeat(65);               
-        let item_type = tmp.as_bytes();    
-        
+        let invalid_item_typ= ITEM_TYPE.repeat(9);                        
+                
         assert_noop!(
             PeaqStorage::add_item(
                 Origin::signed(origin), 
-                item_type.to_vec(), 
-                item.to_vec()
+                invalid_item_typ.to_vec(),
+                ITEM.to_vec()      
         ),
         Error::<Test>::ItemTypeExceedMax64
     );      
@@ -87,15 +83,13 @@ fn add_item_length_exceeds_limit_test(){
         System::set_block_number(1);
         
         let origin = account_key(ACCT);
-        let item_type = b"itemType";
-        let tmp = String::from("a").repeat(129);
-        let item = tmp.as_bytes();
+        let invalid_item= ITEM.repeat(33);                        
         
     assert_noop!(
         PeaqStorage::add_item(
             Origin::signed(origin), 
-            item_type.to_vec(), 
-            item.to_vec()
+            ITEM_TYPE.to_vec(),
+            invalid_item.to_vec()      
         ),
         Error::<Test>::ItemExceedMax128
     );     
@@ -110,15 +104,13 @@ fn update_item_test_ok() {
         System::set_block_number(1);     
 
         let origin = account_key(ACCT);
-        let item_type = b"itemType";
-        let  item = b"item";
         
         //Add an item
         assert_ok!(
             PeaqStorage::add_item(
                 Origin::signed(origin),
-                item_type.to_vec(),
-                item.to_vec()
+                ITEM_TYPE.to_vec(),
+                ITEM.to_vec()      
             )
         );       
 
@@ -126,7 +118,7 @@ fn update_item_test_ok() {
         assert_ok!(
             PeaqStorage::update_item(
                 Origin::signed(origin), 
-                item_type.to_vec(), 
+                ITEM_TYPE.to_vec(),
                 b"new_item".to_vec()
             )
         );
@@ -161,27 +153,23 @@ fn update_item_with_item_length_exceed_limit_test() {
         System::set_block_number(1);     
 
         let origin = account_key(ACCT);
-        let item_type = b"itemType";
-        let item = b"item";
-        let tmp = String::from("a").repeat(129);
+        let invalid_item= ITEM.repeat(33);                        
 
         //Add an item
         assert_ok!(
             PeaqStorage::add_item(
                 Origin::signed(origin),
-                item_type.to_vec(),
-                item.to_vec()
+                ITEM_TYPE.to_vec(),
+                ITEM.to_vec()                                
             )
         );       
-
-        let item=tmp.as_bytes();
 
         //Update the item with item length exceed the limit
         assert_noop!(
             PeaqStorage::update_item(
                 Origin::signed(origin),
-                item_type.to_vec(), 
-                item.to_vec()
+                ITEM_TYPE.to_vec(),
+                invalid_item.to_vec()              
             ),
             Error::<Test>::ItemExceedMax128
 
@@ -199,15 +187,13 @@ fn update_other_owner_item_test() {
         
         let origin = account_key(ACCT);
         let fake_origin = account_key(ACCT2);
-        let item_type = b"itemType";
-        let item = b"item";
-        
+                
         //Add an item with user Iredia
         assert_ok!(
             PeaqStorage::add_item(
                 Origin::signed(origin),
-                item_type.to_vec(),
-                item.to_vec()
+                ITEM_TYPE.to_vec(),
+                ITEM.to_vec()                
             )
         );
 
@@ -215,8 +201,8 @@ fn update_other_owner_item_test() {
         assert_noop!(
             PeaqStorage::update_item(
                 Origin::signed(fake_origin), 
-                item_type.to_vec(), 
-                item.to_vec()
+                ITEM_TYPE.to_vec(),
+                ITEM.to_vec()                
             ),
             Error::<Test>::ItemNotFound
         );               
@@ -231,15 +217,13 @@ fn get_item_test_ok() {
         System::set_block_number(1);     
 
         let origin = account_key(ACCT);
-        let item_type = b"itemType";
-        let item = b"item";
-        
+                
         //Add an item
         assert_ok!(
             PeaqStorage::add_item(
                 Origin::signed(origin),
-                item_type.to_vec(),
-                item.to_vec()
+                ITEM_TYPE.to_vec(),
+                ITEM.to_vec()                
             )
         );       
 
@@ -247,7 +231,7 @@ fn get_item_test_ok() {
         assert_ok!(
             PeaqStorage::get_item(
                 Origin::signed(origin),
-                item_type.to_vec()                
+                ITEM_TYPE.to_vec()                     
             )
 
         );     
@@ -263,14 +247,12 @@ fn get_non_existing_item_test() {
         System::set_block_number(1);     
 
         let origin = account_key(ACCT);
-        let item_type = b"itemType";
-        let item = b"item";
-        
+                
         assert_ok!(
             PeaqStorage::add_item(
                 Origin::signed(origin),
-                item_type.to_vec(),
-                item.to_vec()
+                ITEM_TYPE.to_vec(),
+                ITEM.to_vec()                
             )
         );     
               
@@ -294,15 +276,14 @@ fn get_other_owner_item_test() {
 
         let origin = account_key(ACCT);
         let fake_origin = account_key(ACCT2);
-        let item_type = b"itemType";
-        let item = b"item";
+        
         
         //Add an item 
         assert_ok!(
             PeaqStorage::add_item(
                 Origin::signed(origin),
-                item_type.to_vec(),
-                item.to_vec()
+                ITEM_TYPE.to_vec(),
+                ITEM.to_vec()                
             )
         );       
 
@@ -310,7 +291,7 @@ fn get_other_owner_item_test() {
         assert_noop!(
             PeaqStorage::get_item(
                 Origin::signed(fake_origin),
-                item_type.to_vec()                                
+                ITEM_TYPE.to_vec()                
             ),
             Error::<Test>::ItemNotFound
 
@@ -318,3 +299,4 @@ fn get_other_owner_item_test() {
         
     });
 }
+
