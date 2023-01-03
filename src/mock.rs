@@ -3,7 +3,7 @@ use frame_support::{
 	parameter_types,	
 };
 use frame_system as system;
-use sp_core::{sr25519, H256};
+use sp_core::{sr25519, Pair, H256};
 use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
@@ -76,3 +76,10 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
         .unwrap()
         .into()
 }
+
+pub fn account_key(s: &str) -> sr25519::Public {
+    sr25519::Pair::from_string(&format!("//{}", s), None)
+        .expect("static values are valid; qed")
+        .public()
+}
+
