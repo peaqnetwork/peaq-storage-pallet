@@ -85,7 +85,7 @@ where
             self.client.info().best_hash,
         ));
         api.read(&at, did_account, item_type.to_vec())
-            .map(|o| o.map(|item| Bytes::from(item)))
+            .map(|o| o.map(Bytes::from))
             .map_err(|e| {
                 JsonRpseeError::Call(CallError::Custom(ErrorObject::owned(
                     Error::RuntimeError.into(),

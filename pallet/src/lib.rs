@@ -71,8 +71,8 @@ pub mod pallet {
     impl<T: Config> Error<T> {
         fn dispatch_error(err: StorageError) -> DispatchResult {
             match err {
-                StorageError::NotFound => return Err(Error::<T>::ItemNotFound.into()),
-                StorageError::AlreadyExists => return Err(Error::<T>::ItemTypeAlreadyExists.into()),
+                StorageError::NotFound => Err(Error::<T>::ItemNotFound.into()),
+                StorageError::AlreadyExists => Err(Error::<T>::ItemTypeAlreadyExists.into()),
             }
         }
     }
@@ -164,37 +164,37 @@ pub mod pallet {
         // Add new item of specific type
         fn create(owner: &T::AccountId, item_type: &[u8], item: &[u8]) -> Result<(), StorageError> {
             // Generate id for integrity check
-            let id = Self::get_hashed_key(&owner, &item_type);
+            let id = Self::get_hashed_key(owner, item_type);
 
             // Check if item already exists with the given account and item_type
-            if <ItemStore<T>>::contains_key(&id) {
+            if <ItemStore<T>>::contains_key(id) {
                 return Err(StorageError::AlreadyExists);
             }
 
-            <ItemStore<T>>::insert(&id, item);
+            <ItemStore<T>>::insert(id, item);
 
             Ok(())
         }
 
         // Update existing item of specific type
         fn update(owner: &T::AccountId, item_type: &[u8], item: &[u8]) -> Result<(), StorageError> {
-            let id = Self::get_hashed_key(&owner, &item_type);
+            let id = Self::get_hashed_key(owner, item_type);
 
             // Check if item exists with the given account and item_type
             if !<ItemStore<T>>::contains_key(id) {
                 return Err(StorageError::NotFound);
             }
 
-            <ItemStore<T>>::mutate(&id, |a| *a = item.to_vec());
+            <ItemStore<T>>::mutate(id, |a| *a = item.to_vec());
             Ok(())
         }
 
         // Fetch an item of specific type
         fn read(owner: &T::AccountId, item_type: &[u8]) -> Option<Vec<u8>> {
-            let id = Self::get_hashed_key(&owner, &item_type);
+            let id = Self::get_hashed_key(owner, item_type);
 
-            if <ItemStore<T>>::contains_key(&id) {
-                return Some(Self::item_of(&id));
+            if <ItemStore<T>>::contains_key(id) {
+                return Some(Self::item_of(id));
             }
             None
         }
