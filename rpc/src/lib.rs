@@ -33,7 +33,7 @@ pub trait PeaqStorageApi<BlockHash, AccountId> {
         did_account: AccountId,
         item_type: Bytes,
         at: Option<BlockHash>,
-    ) -> RpcResult<Option<Bytes>>;
+    ) -> RpcResult<Option<StorageRpcResult>>;
 }
 
 /// A struct that implements the [`PeaqStorageApi`].
@@ -78,14 +78,14 @@ where
         did_account: AccountId,
         item_type: Bytes,
         at: Option<<Block as BlockT>::Hash>,
-    ) -> RpcResult<Option<Bytes>> {
+    ) -> RpcResult<Option<StorageRpcResult>> {
         let api = self.client.runtime_api();
         let at = BlockId::hash(at.unwrap_or(
             // If the block hash is not supplied assume the best block.
             self.client.info().best_hash,
         ));
         api.read(&at, did_account, item_type.to_vec())
-            .map(|o| o.map(Bytes::from))
+            .map(|o| o.map(|item| StorageRpcResult::from(item)))
             .map_err(|e| {
                 JsonRpseeError::Call(CallError::Custom(ErrorObject::owned(
                     Error::RuntimeError.into(),
