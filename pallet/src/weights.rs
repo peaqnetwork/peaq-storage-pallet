@@ -44,19 +44,19 @@ pub struct SubstrateWeight<T>(PhantomData<T>);
 impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 	// Storage: PeaqStorage ItemStore (r:1 w:1)
 	fn add_item() -> Weight {
-		Weight::from_ref_time(23_014_000 as u64)
-			.saturating_add(T::DbWeight::get().reads(1 as u64))
-			.saturating_add(T::DbWeight::get().writes(1 as u64))
+		Weight::from_ref_time(23_014_000_u64)
+			.saturating_add(T::DbWeight::get().reads(1_u64))
+			.saturating_add(T::DbWeight::get().writes(1_u64))
 	}
 	// Storage: PeaqStorage ItemStore (r:1 w:1)
 	fn update_item() -> Weight {
-		Weight::from_ref_time(25_127_000 as u64)
-			.saturating_add(T::DbWeight::get().reads(1 as u64))
-			.saturating_add(T::DbWeight::get().writes(1 as u64))
+		Weight::from_ref_time(25_127_000_u64)
+			.saturating_add(T::DbWeight::get().reads(1_u64))
+			.saturating_add(T::DbWeight::get().writes(1_u64))
 	}
 	// Storage: PeaqStorage ItemStore (r:1 w:0)
 	fn get_item() -> Weight {
-		Weight::from_ref_time(23_725_000 as u64)
-			.saturating_add(T::DbWeight::get().reads(1 as u64))
+		Weight::from_ref_time(23_725_000_u64)
+			.saturating_add(T::DbWeight::get().reads(1_u64))
 	}
 }

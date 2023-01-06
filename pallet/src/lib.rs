@@ -4,15 +4,15 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-pub mod structs;
 pub mod enums;
+pub mod structs;
 pub mod traits;
 
 #[cfg(test)]
- mod mock;
+mod mock;
 
 #[cfg(feature = "runtime-benchmarks")]
-  mod benchmarking;
+mod benchmarking;
 
   #[cfg(test)]
   mod tests;
@@ -28,11 +28,11 @@ pub mod pallet {
     use super::WeightInfo;
     use crate::enums::StorageError;
     use crate::traits::*;
-    use frame_support::pallet_prelude::{*, ValueQuery};
+    use frame_support::pallet_prelude::{ValueQuery, *};
     use frame_system::pallet_prelude::*;
     use sp_io::hashing::blake2_256;
     use sp_std::vec::Vec;
-    
+
     /// Configure the pallet by specifying the parameters and types on which it depends.
     #[pallet::config]
     pub trait Config: frame_system::Config {
@@ -49,26 +49,16 @@ pub mod pallet {
     #[pallet::generate_deposit(pub(super) fn deposit_event)]
     pub enum Event<T: Config> {
         /// Event emitted when an storage item has been added. [who, item_type, item]
-        ItemAdded(
-            T::AccountId,
-            Vec<u8>,
-            Vec<u8>,
-        ),
+        ItemAdded(T::AccountId, Vec<u8>, Vec<u8>),
         /// Event emitted when an item is read successfully
-        ItemRead(
-            Vec<u8>,
-        ),
+        ItemRead(Vec<u8>),
         /// Event emitted when an item has been updated. [who, item_type, item]
-        ItemUpdated(
-            T::AccountId,
-            Vec<u8>,
-            Vec<u8>,
-        ),
+        ItemUpdated(T::AccountId, Vec<u8>, Vec<u8>),
     }
 
     #[pallet::error]
     pub enum Error<T> {
-        // Item not found with the given account and item_type 
+        // Item not found with the given account and item_type
         ItemNotFound,
 
         // Item already exists with the given account and item_type
@@ -84,8 +74,8 @@ pub mod pallet {
     impl<T: Config> Error<T> {
         fn dispatch_error(err: StorageError) -> DispatchResult {
             match err {
-                StorageError::NotFound => return Err(Error::<T>::ItemNotFound.into()),
-                StorageError::AlreadyExists => return Err(Error::<T>::ItemTypeAlreadyExists.into()),
+                StorageError::NotFound => Err(Error::<T>::ItemNotFound.into()),
+                StorageError::AlreadyExists => Err(Error::<T>::ItemTypeAlreadyExists.into()),
             }
         }
     }
@@ -97,13 +87,8 @@ pub mod pallet {
 
     #[pallet::storage]
     #[pallet::getter(fn item_of)]
-    pub(super) type ItemStore<T: Config> = StorageMap<
-        _,
-        Blake2_128Concat,
-        [u8; 32],
-        Vec<u8>,
-        ValueQuery,
-    >;
+    pub(super) type ItemStore<T: Config> =
+        StorageMap<_, Blake2_128Concat, [u8; 32], Vec<u8>, ValueQuery>;
 
     #[pallet::hooks]
     impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {}
@@ -113,13 +98,9 @@ pub mod pallet {
     // Dispatchable functions must be annotated with a weight and must return a DispatchResult.
     #[pallet::call]
     impl<T: Config> Pallet<T> {
-        /// Add a new item to the storage 
+        /// Add a new item to the storage
         #[pallet::weight(T::WeightInfo::add_item())]
-        pub fn add_item(
-            origin: OriginFor<T>,
-            item_type: Vec<u8>,
-            item: Vec<u8>,
-        ) -> DispatchResult {
+        pub fn add_item(origin: OriginFor<T>, item_type: Vec<u8>, item: Vec<u8>) -> DispatchResult {
             // Check that an extrinsic was signed and get the signer
             // This fn returns an error if the extrinsic is not signed
             // https://docs.substrate.io/v3/runtime/origins
@@ -130,11 +111,7 @@ pub mod pallet {
 
             match Self::create(&sender, &item_type, &item) {
                 Ok(()) => {
-                    Self::deposit_event(Event::ItemAdded(
-                        sender,
-                        item_type,
-                        item
-                    ));
+                    Self::deposit_event(Event::ItemAdded(sender, item_type, item));
                 }
                 Err(e) => return Error::<T>::dispatch_error(e),
             };
@@ -143,7 +120,7 @@ pub mod pallet {
         }
 
         /// Update an existing item in the storage
-        #[pallet::weight(T::WeightInfo::update_item())]        
+        #[pallet::weight(T::WeightInfo::update_item())]
         pub fn update_item(
             origin: OriginFor<T>,
             item_type: Vec<u8>,
@@ -159,11 +136,7 @@ pub mod pallet {
 
             match Self::update(&sender, &item_type, &item) {
                 Ok(()) => {
-                    Self::deposit_event(Event::ItemUpdated(
-                        sender,
-                        item_type,
-                        item
-                    ));
+                    Self::deposit_event(Event::ItemUpdated(sender, item_type, item));
                 }
                 Err(e) => return Error::<T>::dispatch_error(e),
             };
@@ -172,10 +145,7 @@ pub mod pallet {
 
         /// Read storage item
         #[pallet::weight(T::WeightInfo::get_item())]
-        pub fn get_item(
-            origin: OriginFor<T>,
-            item_type: Vec<u8>
-        ) -> DispatchResult {
+        pub fn get_item(origin: OriginFor<T>, item_type: Vec<u8>) -> DispatchResult {
             // Check that an extrinsic was signed and get the signer
             // This fn returns an error if the extrinsic is not signed
             // https://docs.substrate.io/v3/runtime/origins
@@ -193,57 +163,41 @@ pub mod pallet {
     }
 
     // implements the Storage trait to satisfied the required methods
-    impl<T: Config> Storage<T::AccountId> 
-    for Pallet<T>
-    {
-
+    impl<T: Config> Storage<T::AccountId> for Pallet<T> {
         // Add new item of specific type
-        fn create(
-            owner: &T::AccountId,
-            item_type: &[u8],
-            item: &[u8],
-        ) -> Result<(), StorageError> {
+        fn create(owner: &T::AccountId, item_type: &[u8], item: &[u8]) -> Result<(), StorageError> {
             // Generate id for integrity check
-            let id = Self::get_hashed_key(&owner, &item_type);
+            let id = Self::get_hashed_key(owner, item_type);
 
             // Check if item already exists with the given account and item_type
-            if <ItemStore<T>>::contains_key(&id) {
+            if <ItemStore<T>>::contains_key(id) {
                 return Err(StorageError::AlreadyExists);
             }
 
-            <ItemStore<T>>::insert(&id, item);
+            <ItemStore<T>>::insert(id, item);
 
             Ok(())
         }
 
         // Update existing item of specific type
-        fn update(
-            owner: &T::AccountId,
-            item_type: &[u8],
-            item: &[u8],
-        ) -> Result<(), StorageError> {
-
-            let id = Self::get_hashed_key(&owner, &item_type);
+        fn update(owner: &T::AccountId, item_type: &[u8], item: &[u8]) -> Result<(), StorageError> {
+            let id = Self::get_hashed_key(owner, item_type);
 
             // Check if item exists with the given account and item_type
             if !<ItemStore<T>>::contains_key(id) {
                 return Err(StorageError::NotFound);
             }
 
-            <ItemStore<T>>::mutate(&id, |a| *a = item.to_vec());
+            <ItemStore<T>>::mutate(id, |a| *a = item.to_vec());
             Ok(())
         }
 
         // Fetch an item of specific type
-        fn read(
-            owner: &T::AccountId,
-            item_type: &[u8],
-        ) -> Option<Vec<u8>>
-        {
-            let id = Self::get_hashed_key(&owner, &item_type);
+        fn read(owner: &T::AccountId, item_type: &[u8]) -> Option<Vec<u8>> {
+            let id = Self::get_hashed_key(owner, item_type);
 
-            if <ItemStore<T>>::contains_key(&id) {
-                return Some(Self::item_of(&id));
+            if <ItemStore<T>>::contains_key(id) {
+                return Some(Self::item_of(id));
             }
             None
         }
