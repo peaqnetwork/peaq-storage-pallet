@@ -4,6 +4,7 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
+pub mod structs;
 pub mod enums;
 pub mod structs;
 pub mod traits;
@@ -13,6 +14,9 @@ mod mock;
 
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
+
+  #[cfg(test)]
+  mod tests;
 
 pub mod weights;
 pub use weights::WeightInfo;
