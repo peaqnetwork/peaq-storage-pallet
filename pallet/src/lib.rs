@@ -4,7 +4,6 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-pub mod structs;
 pub mod enums;
 pub mod structs;
 pub mod traits;
