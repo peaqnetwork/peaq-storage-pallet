@@ -13,7 +13,7 @@ It stores a key-value pair with the key being user public key + type of item and
 
 [dependencies.peaq-pallet-storage]
 default-features = false
-git = 'https://github.com/peaqnetwork/peaq-pallet-did.git'
+git = 'https://github.com/peaqnetwork/peaq-storage-pallet.git'
 version = '0.0.1'
 
 # --snip--
@@ -85,7 +85,7 @@ Currently peaq storage pallet supports following three Extrinsics:
 #### Read Item:
 * To read an item against the given item type
 * Owner can only read their owned item
-* if a user try to read item owned by another other owner, item not found error will be 
+* if a user try to read item owned by another  owner, item not found error will be 
   returned
 
 **Example**
