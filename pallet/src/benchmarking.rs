@@ -2,7 +2,7 @@
 
 use super::*;
 use crate::Pallet as STORAGE;
-use frame_benchmarking::{account, benchmarks};
+use frame_benchmarking::v1::{account, benchmarks};
 use frame_system::{Pallet as System, RawOrigin};
 
 /// Assert that the last event equals the provided one.
