@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 use sp_api::ProvideRuntimeApi;
 use sp_blockchain::HeaderBackend;
 use sp_core::Bytes;
-use sp_runtime::{generic::BlockId, traits::Block as BlockT};
+use sp_runtime::traits::Block as BlockT;
 
 #[derive(Clone, Encode, Decode, Serialize, Deserialize)]
 pub struct StorageRpcResult {
@@ -32,7 +32,7 @@ pub trait PeaqStorageApi<BlockHash, AccountId> {
         &self,
         did_account: AccountId,
         item_type: Bytes,
-        at: Option<BlockHash>,
+        at: BlockHash,
     ) -> RpcResult<Option<StorageRpcResult>>;
 }
 
@@ -77,14 +77,10 @@ where
         &self,
         did_account: AccountId,
         item_type: Bytes,
-        at: Option<<Block as BlockT>::Hash>,
+        at: <Block as BlockT>::Hash,
     ) -> RpcResult<Option<StorageRpcResult>> {
         let api = self.client.runtime_api();
-        let at = BlockId::hash(at.unwrap_or(
-            // If the block hash is not supplied assume the best block.
-            self.client.info().best_hash,
-        ));
-        api.read(&at, did_account, item_type.to_vec())
+        api.read(at, did_account, item_type.to_vec())
             .map(|o| o.map(|item| StorageRpcResult::from(item)))
             .map_err(|e| {
                 JsonRpseeError::Call(CallError::Custom(ErrorObject::owned(
