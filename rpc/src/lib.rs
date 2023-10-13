@@ -81,7 +81,7 @@ where
     ) -> RpcResult<Option<StorageRpcResult>> {
         let api = self.client.runtime_api();
         api.read(at, did_account, item_type.to_vec())
-            .map(|o| o.map(|item| StorageRpcResult::from(item)))
+            .map(|o| o.map(StorageRpcResult::from))
             .map_err(|e| {
                 JsonRpseeError::Call(CallError::Custom(ErrorObject::owned(
                     Error::RuntimeError.into(),
