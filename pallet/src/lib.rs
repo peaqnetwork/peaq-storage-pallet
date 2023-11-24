@@ -14,8 +14,8 @@ mod mock;
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
 
-  #[cfg(test)]
-  mod tests;
+#[cfg(test)]
+mod tests;
 
 pub mod weights;
 pub use weights::WeightInfo;
@@ -81,7 +81,6 @@ pub mod pallet {
     }
 
     #[pallet::pallet]
-    #[pallet::generate_store(pub(super) trait Store)]
     #[pallet::without_storage_info]
     pub struct Pallet<T>(_);
 
