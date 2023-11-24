@@ -1,6 +1,6 @@
 [package]
 name = "peaq-pallet-storage-runtime-api"
-version = "0.0.1"
+version = "0.1.0"
 edition = "2021"
 description = "Implementation of RuntimeApi for Peaq Storage pallet"
 authors = ["peaq network <https://github.com/peaqnetwork>"]

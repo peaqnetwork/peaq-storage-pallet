@@ -1,6 +1,6 @@
 [package]
 name = "peaq-pallet-storage-rpc"
-version = "0.0.1"
+version = "0.1.0"
 description = "peaq storage pallet rpc interface."
 edition = "2021"
 authors = ["peaq network <https://github.com/peaqnetwork>"]
