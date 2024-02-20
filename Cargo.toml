@@ -8,6 +8,30 @@ license = "Apache-2.0"
 publish = false
 repository = "https://github.com/peaqnetwork/peaq-pallet-storage/"
 
+[workspace.dependencies]
+hex-literal = "0.3.3"
+
+parity-scale-codec = { version = "3.2.2", default-features = false }
+frame-support = { default-features = false, git = "https://github.com/peaqnetwork/substrate", branch = "peaq-polkadot-v0.9.43" }
+frame-system = { default-features = false, git = "https://github.com/peaqnetwork/substrate", branch = "peaq-polkadot-v0.9.43" }
+scale-info = { default-features = false, version = "2.0.1" }
+sp-runtime = { default-features = false, git = "https://github.com/peaqnetwork/substrate", branch = "peaq-polkadot-v0.9.43" }
+sp-core = { default-features = false, git = "https://github.com/peaqnetwork/substrate", branch = "peaq-polkadot-v0.9.43" }
+sp-io = { default-features = false, git = "https://github.com/peaqnetwork/substrate", branch = "peaq-polkadot-v0.9.43" }
+sp-std = { default-features = false, git = "https://github.com/peaqnetwork/substrate", branch = "peaq-polkadot-v0.9.43" }
+frame-benchmarking = { default-features = false, git = "https://github.com/peaqnetwork/substrate", branch = "peaq-polkadot-v0.9.43" }
+sp-api = { default-features = false, git = "https://github.com/peaqnetwork/substrate", branch = "peaq-polkadot-v0.9.43" }
+sp-blockchain = { default-features = false, git = "https://github.com/peaqnetwork/substrate", branch = "peaq-polkadot-v0.9.43" }
+sp-rpc = { default-features = false, git = "https://github.com/peaqnetwork/substrate", branch = "peaq-polkadot-v0.9.43" }
+
+serde = "1.0.136"
+jsonrpc-core = "18.0.0"
+jsonrpc-core-client = "18.0.0"
+jsonrpc-derive = "18.0.0"
+jsonrpsee = { version = "0.16.2" }
+
+serde_json = "1.0"
+
 [workspace]
 members = [
 	"pallet",
