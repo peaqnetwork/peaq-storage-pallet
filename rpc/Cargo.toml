@@ -10,7 +10,7 @@ repository = { workspace = true }
 authors = { workspace = true }
 
 [dependencies]
-parity-scale-codec = { workspace = true, version = "3.2.2" }
+parity-scale-codec = { workspace = true }
 jsonrpc-core = { workspace = true }
 jsonrpc-core-client = { workspace = true }
 jsonrpc-derive = { workspace = true }
