@@ -17,8 +17,8 @@ mod benchmarking;
 #[cfg(test)]
 mod tests;
 
-pub mod weights;
 pub mod weightinfo;
+pub mod weights;
 pub use weightinfo::WeightInfo;
 
 // Re-export pallet items so that they can be accessed from the crate namespace.
