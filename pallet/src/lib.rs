@@ -65,11 +65,14 @@ pub mod pallet {
         // Item already exists with the given account and item_type
         ItemTypeAlreadyExists,
 
-        // Item type is greater that 64
+        // Item type is greater than 64
         ItemTypeExceedMax64,
 
-        // Item is greater that 128
+        // Item is greater than 128
         ItemExceedMax128,
+
+        // Item is greater than 256
+        ItemExceedMax256,
     }
 
     impl<T: Config> Error<T> {
@@ -133,8 +136,8 @@ pub mod pallet {
             // https://docs.substrate.io/v3/runtime/origins
             let sender = ensure_signed(origin)?;
 
-            // Verify that the item len is 128 max
-            ensure!(item.len() <= 128, Error::<T>::ItemExceedMax128);
+            // Verify that the item len is 256 max
+            ensure!(item.len() <= 256, Error::<T>::ItemExceedMax256);
 
             match Self::update(&sender, &item_type, &item) {
                 Ok(()) => {

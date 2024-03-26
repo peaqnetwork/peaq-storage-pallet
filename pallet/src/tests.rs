@@ -138,7 +138,7 @@ fn update_item_with_item_length_exceed_limit_test() {
         System::set_block_number(1);
 
         let origin = account_key(ACCT);
-        let invalid_item = ITEM.repeat(33);
+        let invalid_item = ITEM.repeat(66);
 
         //Add an item
         assert_ok!(PeaqStorage::add_item(
@@ -154,7 +154,7 @@ fn update_item_with_item_length_exceed_limit_test() {
                 ITEM_TYPE.to_vec(),
                 invalid_item.to_vec()
             ),
-            Error::<Test>::ItemExceedMax128
+            Error::<Test>::ItemExceedMax256
         );
     });
 }
