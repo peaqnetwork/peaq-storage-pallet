@@ -14,7 +14,7 @@ Storage pallet has 3 extrinsic calls as of now.
 
 - `addItem`
 
-Params - item type (Max length 64), item (Max length 128).
+Params - item type (Max length 64), item (Max length 256).
 
 Description - For adding an item type with any item.
 
@@ -34,7 +34,7 @@ Description - For reading the item with the item&#39;s type. A user can only acc
 
 - `updateItem`
 
-Params - item type (Max length 64), item (Max length 128).
+Params - item type (Max length 64), item (Max length 256).
 
 Description - For updating item type with a new item. Only items can be updated not item type. Each item type is attached to the user&#39;s public key.
 
