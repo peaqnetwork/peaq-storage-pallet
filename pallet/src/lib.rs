@@ -111,7 +111,7 @@ pub mod pallet {
             let sender = ensure_signed(origin)?;
 
             ensure!(item_type.len() <= 64, Error::<T>::ItemTypeExceedMax64);
-            ensure!(item.len() <= 128, Error::<T>::ItemExceedMax128);
+            ensure!(item.len() <= 256, Error::<T>::ItemExceedMax256);
 
             match Self::create(&sender, &item_type, &item) {
                 Ok(()) => {
