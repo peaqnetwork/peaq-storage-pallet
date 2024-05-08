@@ -29,10 +29,16 @@ pub mod pallet {
     use super::WeightInfo;
     use crate::enums::StorageError;
     use crate::traits::*;
-    use frame_support::pallet_prelude::{ValueQuery, *};
+    use frame_support::{
+        pallet_prelude::{ValueQuery, *},
+        traits::{Currency, ReservableCurrency},
+    };
     use frame_system::pallet_prelude::*;
     use sp_io::hashing::blake2_256;
     use sp_std::vec::Vec;
+
+    pub type AccountIdOf<T> = <T as frame_system::Config>::AccountId;
+    pub type BalanceOf<T> = <<T as Config>::Currency as Currency<AccountIdOf<T>>>::Balance;
 
     /// Configure the pallet by specifying the parameters and types on which it depends.
     #[pallet::config]
@@ -41,6 +47,10 @@ pub mod pallet {
         type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
         /// Weight information for extrinsics in this pallet.
         type WeightInfo: WeightInfo;
+        /// Deposit amount for utilising storage
+        type StorageDeposit: Get<BalanceOf<Self>>;
+        /// Currency Type
+        type Currency: ReservableCurrency<Self::AccountId>;
     }
 
     // Pallets use events to inform users when important changes are made.
