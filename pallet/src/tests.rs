@@ -1,3 +1,4 @@
+use crate::Config;
 use crate::{mock::*, Error};
 use frame_support::{assert_noop, assert_ok};
 
@@ -15,6 +16,12 @@ fn add_item_test_ok() {
             ITEM_TYPE.to_vec(),
             ITEM.to_vec()
         ));
+
+        // correct storage deposit was deducted or not
+        assert_eq!(
+            <Test as Config>::Currency::reserved_balance(&ALICE),
+            StorageDeposit::get()
+        );
     });
 }
 
@@ -40,6 +47,12 @@ fn add_item_duplicate_test() {
             ),
             Error::<Test>::ItemTypeAlreadyExists
         );
+
+        // correct storage deposit was deducted or not
+        assert_eq!(
+            <Test as Config>::Currency::reserved_balance(&ALICE),
+            StorageDeposit::get()
+        );
     });
 }
 
@@ -59,6 +72,9 @@ fn add_item_type_length_exceeds_limit_test() {
             ),
             Error::<Test>::ItemTypeExceedMax64
         );
+
+        // no deposit deducted
+        assert_eq!(<Test as Config>::Currency::reserved_balance(&ALICE), 0);
     });
 }
 
@@ -78,6 +94,9 @@ fn add_item_length_exceeds_limit_test() {
             ),
             Error::<Test>::ItemExceedMax256
         );
+
+        // no deposit deducted
+        assert_eq!(<Test as Config>::Currency::reserved_balance(&ALICE), 0);
     });
 }
 
@@ -230,5 +249,70 @@ fn get_other_owner_item_test() {
             PeaqStorage::get_item(RuntimeOrigin::signed(BOB), ITEM_TYPE.to_vec()),
             Error::<Test>::ItemNotFound
         );
+    });
+}
+
+#[test]
+fn remove_item_is_ok() {
+    new_test_ext().execute_with(|| {
+        System::set_block_number(1);
+
+        //Add an item
+        assert_ok!(PeaqStorage::add_item(
+            RuntimeOrigin::signed(ALICE),
+            ITEM_TYPE.to_vec(),
+            ITEM.to_vec()
+        ));
+        assert_eq!(
+            <Test as Config>::Currency::reserved_balance(&ALICE),
+            StorageDeposit::get()
+        );
+
+        //Remove the item
+        assert_ok!(PeaqStorage::remove_item(
+            RuntimeOrigin::signed(ALICE),
+            ITEM_TYPE.to_vec()
+        ));
+
+        assert_eq!(<Test as Config>::Currency::reserved_balance(&ALICE), 0);
+    });
+}
+
+#[test]
+fn remove_non_existing_item() {
+    new_test_ext().execute_with(|| {
+        System::set_block_number(1);
+
+        //Remove the item
+        assert_noop!(
+            PeaqStorage::remove_item(RuntimeOrigin::signed(ALICE), ITEM_TYPE.to_vec()),
+            Error::<Test>::ItemNotFound
+        );
+        assert_eq!(<Test as Config>::Currency::reserved_balance(&ALICE), 0);
+    });
+}
+
+#[test]
+fn remove_someone_elses_item() {
+    new_test_ext().execute_with(|| {
+        System::set_block_number(1);
+
+        //Add an item
+        assert_ok!(PeaqStorage::add_item(
+            RuntimeOrigin::signed(ALICE),
+            ITEM_TYPE.to_vec(),
+            ITEM.to_vec()
+        ));
+        assert_eq!(
+            <Test as Config>::Currency::reserved_balance(&ALICE),
+            StorageDeposit::get()
+        );
+
+        //Remove the item
+        assert_noop!(
+            PeaqStorage::remove_item(RuntimeOrigin::signed(BOB), ITEM_TYPE.to_vec()),
+            Error::<Test>::ItemNotFound
+        );
+        assert_eq!(<Test as Config>::Currency::reserved_balance(&BOB), 0);
     });
 }

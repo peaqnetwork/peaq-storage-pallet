@@ -65,6 +65,8 @@ pub mod pallet {
         ItemRead(Vec<u8>),
         /// Event emitted when an item has been updated. [who, item_type, item]
         ItemUpdated(T::AccountId, Vec<u8>, Vec<u8>),
+        /// Event emitted when an item has been removed. [who, item_type]
+        ItemRemoved(T::AccountId, Vec<u8>),
     }
 
     #[pallet::error]
@@ -125,8 +127,8 @@ pub mod pallet {
 
             match Self::create(&sender, &item_type, &item) {
                 Ok(()) => {
-                    Self::deposit_event(Event::ItemAdded(sender.clone(), item_type, item));
                     T::Currency::reserve(&sender, T::StorageDeposit::get())?;
+                    Self::deposit_event(Event::ItemAdded(sender.clone(), item_type, item));
                 }
                 Err(e) => return Error::<T>::dispatch_error(e),
             };
@@ -153,7 +155,6 @@ pub mod pallet {
             match Self::update(&sender.clone(), &item_type, &item) {
                 Ok(()) => {
                     Self::deposit_event(Event::ItemUpdated(sender.clone(), item_type, item));
-                    T::Currency::reserve(&sender, T::StorageDeposit::get())?;
                 }
                 Err(e) => return Error::<T>::dispatch_error(e),
             };
@@ -175,6 +176,25 @@ pub mod pallet {
                     Self::deposit_event(Event::ItemRead(value));
                 }
                 None => return Err(Error::<T>::ItemNotFound.into()),
+            }
+            Ok(())
+        }
+
+        /// Read storage item
+        #[pallet::call_index(3)]
+        #[pallet::weight(T::WeightInfo::get_item())]
+        pub fn remove_item(origin: OriginFor<T>, item_type: Vec<u8>) -> DispatchResult {
+            // Check that an extrinsic was signed and get the signer
+            // This fn returns an error if the extrinsic is not signed
+            // https://docs.substrate.io/v3/runtime/origins
+            let sender = ensure_signed(origin)?;
+
+            match Self::remove(&sender, &item_type) {
+                Ok(()) => {
+                    T::Currency::unreserve(&sender, T::StorageDeposit::get());
+                    Self::deposit_event(Event::ItemRemoved(sender.clone(), item_type));
+                }
+                Err(e) => return Error::<T>::dispatch_error(e),
             }
             Ok(())
         }
@@ -218,6 +238,18 @@ pub mod pallet {
                 return Some(Self::item_of(id));
             }
             None
+        }
+
+        fn remove(owner: &T::AccountId, item_type: &[u8]) -> Result<(), StorageError> {
+            let id = Self::get_hashed_key(owner, item_type);
+
+            // Check if item exists with the given account and item_type
+            if !<ItemStore<T>>::contains_key(id) {
+                return Err(StorageError::NotFound);
+            }
+
+            <ItemStore<T>>::remove(id);
+            Ok(())
         }
 
         fn get_hashed_key(account: &T::AccountId, value: &[u8]) -> [u8; 32] {

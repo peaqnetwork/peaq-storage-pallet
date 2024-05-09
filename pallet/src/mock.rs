@@ -1,6 +1,6 @@
 use crate as peaq_storage;
 use frame_support::parameter_types;
-use sp_core::{sr25519, Pair, H256};
+use sp_core::H256;
 use sp_io::TestExternalities;
 use sp_runtime::{
     testing::Header,
@@ -117,10 +117,4 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
     let mut ext = TestExternalities::from(storage);
     ext.execute_with(|| System::set_block_number(1));
     ext
-}
-
-pub fn account_key(s: &str) -> sr25519::Public {
-    sr25519::Pair::from_string(&format!("//{}", s), None)
-        .expect("static values are valid; qed")
-        .public()
 }
