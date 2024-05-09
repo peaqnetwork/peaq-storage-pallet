@@ -125,7 +125,8 @@ pub mod pallet {
 
             match Self::create(&sender, &item_type, &item) {
                 Ok(()) => {
-                    Self::deposit_event(Event::ItemAdded(sender, item_type, item));
+                    Self::deposit_event(Event::ItemAdded(sender.clone(), item_type, item));
+                    T::Currency::reserve(&sender, T::StorageDeposit::get())?;
                 }
                 Err(e) => return Error::<T>::dispatch_error(e),
             };
@@ -149,9 +150,10 @@ pub mod pallet {
             // Verify that the item len is 256 max
             ensure!(item.len() <= 256, Error::<T>::ItemExceedMax256);
 
-            match Self::update(&sender, &item_type, &item) {
+            match Self::update(&sender.clone(), &item_type, &item) {
                 Ok(()) => {
-                    Self::deposit_event(Event::ItemUpdated(sender, item_type, item));
+                    Self::deposit_event(Event::ItemUpdated(sender.clone(), item_type, item));
+                    T::Currency::reserve(&sender, T::StorageDeposit::get())?;
                 }
                 Err(e) => return Error::<T>::dispatch_error(e),
             };
