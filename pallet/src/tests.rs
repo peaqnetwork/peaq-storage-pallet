@@ -288,8 +288,8 @@ fn remove_item_is_ok() {
         //Add an item
         assert_ok!(PeaqStorage::add_item(
             RuntimeOrigin::signed(ALICE),
-            ITEM_TYPE.to_vec(),
-            ITEM.to_vec()
+            BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
+            BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
         assert_eq!(
             <Test as Config>::Currency::reserved_balance(&ALICE),
@@ -299,7 +299,7 @@ fn remove_item_is_ok() {
         //Remove the item
         assert_ok!(PeaqStorage::remove_item(
             RuntimeOrigin::signed(ALICE),
-            ITEM_TYPE.to_vec()
+            BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap()
         ));
 
         assert_eq!(<Test as Config>::Currency::reserved_balance(&ALICE), 0);
@@ -313,7 +313,10 @@ fn remove_non_existing_item() {
 
         //Remove the item
         assert_noop!(
-            PeaqStorage::remove_item(RuntimeOrigin::signed(ALICE), ITEM_TYPE.to_vec()),
+            PeaqStorage::remove_item(
+                RuntimeOrigin::signed(ALICE),
+                BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap()
+            ),
             Error::<Test>::ItemNotFound
         );
         assert_eq!(<Test as Config>::Currency::reserved_balance(&ALICE), 0);
@@ -328,8 +331,8 @@ fn remove_someone_elses_item() {
         //Add an item
         assert_ok!(PeaqStorage::add_item(
             RuntimeOrigin::signed(ALICE),
-            ITEM_TYPE.to_vec(),
-            ITEM.to_vec()
+            BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
+            BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
         assert_eq!(
             <Test as Config>::Currency::reserved_balance(&ALICE),
@@ -338,7 +341,10 @@ fn remove_someone_elses_item() {
 
         //Remove the item
         assert_noop!(
-            PeaqStorage::remove_item(RuntimeOrigin::signed(BOB), ITEM_TYPE.to_vec()),
+            PeaqStorage::remove_item(
+                RuntimeOrigin::signed(BOB),
+                BoundedVec::try_from(ITEM.to_vec()).unwrap()
+            ),
             Error::<Test>::ItemNotFound
         );
         assert_eq!(<Test as Config>::Currency::reserved_balance(&BOB), 0);
