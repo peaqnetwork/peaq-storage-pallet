@@ -4,6 +4,7 @@ use super::*;
 use crate::Pallet as STORAGE;
 use frame_benchmarking::v1::{account, benchmarks};
 use frame_system::{Pallet as System, RawOrigin};
+use sp_std::vec;
 
 /// Assert that the last event equals the provided one.
 fn assert_last_event<T: Config>(generic_event: <T as Config>::RuntimeEvent) {
@@ -11,51 +12,54 @@ fn assert_last_event<T: Config>(generic_event: <T as Config>::RuntimeEvent) {
 }
 
 const CALLER_ACCOUNT_STR: &str = "Iredia1";
-const ITEM_TYPE_BYTES: &[u8; 4] = b"test";
-const ITEM_BYTES: &[u8; 9] = b"123456789";
 
 benchmarks! {
     add_item {
         let caller: T::AccountId =  account(CALLER_ACCOUNT_STR,0, 0);
+        let item_type = vec![0; 64];
+        let item = vec![0; 256];
 
-    }: _(RawOrigin::Signed(caller.clone()), ITEM_TYPE_BYTES.to_vec(), ITEM_BYTES.to_vec())
+    }: _(RawOrigin::Signed(caller.clone()), item_type.clone(), item.clone())
     verify {
         assert_last_event::<T>(Event::<T>::ItemAdded(
             caller.into(),
-            ITEM_TYPE_BYTES.to_vec(),
-            ITEM_BYTES.to_vec(),
+            item_type,
+            item,
         ).into());
     }
     update_item {
         let caller : T::AccountId = account(CALLER_ACCOUNT_STR, 0, 0);
-        let new_item = b"987654321";
+        let item_type = vec![0; 64];
+        let new_item = vec![1; 256];
 
         <STORAGE<T>>::add_item(
             RawOrigin::Signed(caller.clone()).into(),
-            ITEM_TYPE_BYTES.to_vec(),
-            ITEM_BYTES.to_vec() )?;
+            item_type.clone(),
+            vec![0;256])?;
 
-    }: _(RawOrigin::Signed(caller.clone()), ITEM_TYPE_BYTES.to_vec(), new_item.to_vec())
+    }: _(RawOrigin::Signed(caller.clone()), item_type.clone(), new_item.clone())
     verify {
         assert_last_event::<T>(Event::<T>::ItemUpdated(
             caller.into(),
-            ITEM_TYPE_BYTES.to_vec(),
-            new_item.to_vec(),
+            item_type,
+            new_item,
         ).into());
     }
 
     get_item {
         let caller : T::AccountId = account(CALLER_ACCOUNT_STR, 0, 0);
+        let item_type = vec![0; 64];
+        let item = vec![1; 256];
 
         <STORAGE<T>>::add_item(
             RawOrigin::Signed(caller.clone()).into(),
-            ITEM_TYPE_BYTES.to_vec(),
-            ITEM_BYTES.to_vec() )?;
+            item_type.clone(),
+            item.clone())?;
 
-    }: _(RawOrigin::Signed(caller.clone()), ITEM_TYPE_BYTES.to_vec())
+    }: _(RawOrigin::Signed(caller.clone()), item_type)
     verify {
         assert_last_event::<T>(Event::<T>::ItemRead (
-            ITEM_BYTES.to_vec(),
+            item,
         ).into());
     }
 
