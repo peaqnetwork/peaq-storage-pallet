@@ -4,6 +4,7 @@ use super::*;
 use crate::Pallet as STORAGE;
 use frame_benchmarking::v1::{account, benchmarks};
 use frame_system::{Pallet as System, RawOrigin};
+use sp_runtime::BoundedVec;
 use sp_std::vec;
 
 /// Assert that the last event equals the provided one.
@@ -16,8 +17,8 @@ const CALLER_ACCOUNT_STR: &str = "Iredia1";
 benchmarks! {
     add_item {
         let caller: T::AccountId =  account(CALLER_ACCOUNT_STR,0, 0);
-        let item_type = vec![0; 64];
-        let item = vec![0; 256];
+        let item_type = BoundedVec::try_from(vec![0; 64]).unwrap();
+        let item = BoundedVec::try_from(vec![0; 256]).unwrap();
 
     }: _(RawOrigin::Signed(caller.clone()), item_type.clone(), item.clone())
     verify {
@@ -29,13 +30,13 @@ benchmarks! {
     }
     update_item {
         let caller : T::AccountId = account(CALLER_ACCOUNT_STR, 0, 0);
-        let item_type = vec![0; 64];
-        let new_item = vec![1; 256];
+        let item_type = BoundedVec::try_from(vec![0; 64]).unwrap();
+        let new_item = BoundedVec::try_from(vec![1; 256]).unwrap();
 
         <STORAGE<T>>::add_item(
             RawOrigin::Signed(caller.clone()).into(),
             item_type.clone(),
-            vec![0;256])?;
+            BoundedVec::try_from(vec![0;256]).unwrap())?;
 
     }: _(RawOrigin::Signed(caller.clone()), item_type.clone(), new_item.clone())
     verify {
@@ -48,8 +49,8 @@ benchmarks! {
 
     get_item {
         let caller : T::AccountId = account(CALLER_ACCOUNT_STR, 0, 0);
-        let item_type = vec![0; 64];
-        let item = vec![1; 256];
+        let item_type = BoundedVec::try_from(vec![0; 64]).unwrap();
+        let item = BoundedVec::try_from(vec![1; 256]).unwrap();
 
         <STORAGE<T>>::add_item(
             RawOrigin::Signed(caller.clone()).into(),
