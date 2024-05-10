@@ -1,6 +1,7 @@
 use crate::{mock::*, Error};
 use crate::{Config, MAX_STORAGE_ITEM_SIZE};
 use frame_support::{assert_noop, assert_ok};
+use sp_runtime::BoundedVec;
 
 const ITEM_TYPE: &[u8; 8] = b"itemType";
 const ITEM: &[u8; 4] = b"item";
@@ -16,8 +17,8 @@ fn add_item_test_ok() {
 
         assert_ok!(PeaqStorage::add_item(
             RuntimeOrigin::signed(ALICE),
-            ITEM_TYPE.to_vec(),
-            ITEM.to_vec()
+            BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
+            BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
 
         // correct storage deposit was deducted or not
@@ -37,16 +38,16 @@ fn add_item_duplicate_test() {
         //Add an item
         assert_ok!(PeaqStorage::add_item(
             RuntimeOrigin::signed(ALICE),
-            ITEM_TYPE.to_vec(),
-            ITEM.to_vec()
+            BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
+            BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
 
         //Add the same item again
         assert_noop!(
             PeaqStorage::add_item(
                 RuntimeOrigin::signed(ALICE),
-                ITEM_TYPE.to_vec(),
-                ITEM.to_vec()
+                BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
+                BoundedVec::try_from(ITEM.to_vec()).unwrap()
             ),
             Error::<Test>::ItemTypeAlreadyExists
         );
@@ -70,8 +71,8 @@ fn add_item_type_length_exceeds_limit_test() {
         assert_noop!(
             PeaqStorage::add_item(
                 RuntimeOrigin::signed(ALICE),
-                invalid_item_typ.to_vec(),
-                ITEM.to_vec()
+                BoundedVec::try_from(invalid_item_typ.to_vec()).unwrap(),
+                BoundedVec::try_from(ITEM.to_vec()).unwrap()
             ),
             Error::<Test>::ItemTypeExceedMax64
         );
@@ -92,8 +93,8 @@ fn add_item_length_exceeds_limit_test() {
         assert_noop!(
             PeaqStorage::add_item(
                 RuntimeOrigin::signed(ALICE),
-                ITEM_TYPE.to_vec(),
-                invalid_item.to_vec()
+                BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
+                BoundedVec::try_from(invalid_item.to_vec()).unwrap()
             ),
             Error::<Test>::ItemExceedMax256
         );
@@ -112,15 +113,15 @@ fn update_item_test_ok() {
         //Add an item
         assert_ok!(PeaqStorage::add_item(
             RuntimeOrigin::signed(ALICE),
-            ITEM_TYPE.to_vec(),
-            ITEM.to_vec()
+            BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
+            BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
 
         //update item
         assert_ok!(PeaqStorage::update_item(
             RuntimeOrigin::signed(ALICE),
-            ITEM_TYPE.to_vec(),
-            b"new_item".to_vec()
+            BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
+            BoundedVec::try_from(b"new_item".to_vec()).unwrap()
         ));
 
         // correct storage deposit was deducted or not
@@ -140,8 +141,8 @@ fn update_non_existing_item_test() {
         assert_noop!(
             PeaqStorage::update_item(
                 RuntimeOrigin::signed(ALICE),
-                b"new_item_type".to_vec(),
-                b"new_item".to_vec()
+                BoundedVec::try_from(b"new_item_type".to_vec()).unwrap(),
+                BoundedVec::try_from(b"new_item".to_vec()).unwrap()
             ),
             Error::<Test>::ItemNotFound
         );
@@ -158,16 +159,16 @@ fn update_item_with_item_length_exceed_limit_test() {
         //Add an item
         assert_ok!(PeaqStorage::add_item(
             RuntimeOrigin::signed(ALICE),
-            ITEM_TYPE.to_vec(),
-            ITEM.to_vec()
+            BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
+            BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
 
         //Update the item with item length exceed the limit
         assert_noop!(
             PeaqStorage::update_item(
                 RuntimeOrigin::signed(ALICE),
-                ITEM_TYPE.to_vec(),
-                invalid_item.to_vec()
+                BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
+                BoundedVec::try_from(invalid_item.to_vec()).unwrap()
             ),
             Error::<Test>::ItemExceedMax256
         );
@@ -189,8 +190,8 @@ fn update_other_owner_item_test() {
         //Add an item with user Iredia
         assert_ok!(PeaqStorage::add_item(
             RuntimeOrigin::signed(ALICE),
-            ITEM_TYPE.to_vec(),
-            ITEM.to_vec()
+            BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
+            BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
         // correct storage deposit was deducted or not
         assert_eq!(
@@ -201,8 +202,8 @@ fn update_other_owner_item_test() {
         assert_noop!(
             PeaqStorage::update_item(
                 RuntimeOrigin::signed(BOB),
-                ITEM_TYPE.to_vec(),
-                ITEM.to_vec()
+                BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
+                BoundedVec::try_from(ITEM.to_vec()).unwrap()
             ),
             Error::<Test>::ItemNotFound
         );
@@ -220,14 +221,14 @@ fn get_item_test_ok() {
         //Add an item
         assert_ok!(PeaqStorage::add_item(
             RuntimeOrigin::signed(ALICE),
-            ITEM_TYPE.to_vec(),
-            ITEM.to_vec()
+            BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
+            BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
 
         //Get the same item
         assert_ok!(PeaqStorage::get_item(
             RuntimeOrigin::signed(ALICE),
-            ITEM_TYPE.to_vec()
+            BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap()
         ));
     });
 }
@@ -240,13 +241,16 @@ fn get_non_existing_item_test() {
 
         assert_ok!(PeaqStorage::add_item(
             RuntimeOrigin::signed(ALICE),
-            ITEM_TYPE.to_vec(),
-            ITEM.to_vec()
+            BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
+            BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
 
         //Get a non existing item
         assert_noop!(
-            PeaqStorage::get_item(RuntimeOrigin::signed(ALICE), b"new_item_type".to_vec()),
+            PeaqStorage::get_item(
+                RuntimeOrigin::signed(ALICE),
+                BoundedVec::try_from(b"new_item_type".to_vec()).unwrap()
+            ),
             Error::<Test>::ItemNotFound
         );
     });
@@ -261,13 +265,16 @@ fn get_other_owner_item_test() {
         //Add an item
         assert_ok!(PeaqStorage::add_item(
             RuntimeOrigin::signed(ALICE),
-            ITEM_TYPE.to_vec(),
-            ITEM.to_vec()
+            BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
+            BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
 
         //Get anotehr owner's item
         assert_noop!(
-            PeaqStorage::get_item(RuntimeOrigin::signed(BOB), ITEM_TYPE.to_vec()),
+            PeaqStorage::get_item(
+                RuntimeOrigin::signed(BOB),
+                BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap()
+            ),
             Error::<Test>::ItemNotFound
         );
     });

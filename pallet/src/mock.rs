@@ -38,7 +38,8 @@ frame_support::construct_runtime!(
 parameter_types! {
     pub const BlockHashCount: u64 = 250;
     pub const SS58Prefix: u8 = 42;
-
+    // I made it bigger to avoid the error for data lenght test
+    pub const BoundedDataLen: u32 = 2560;
 }
 
 impl frame_system::Config for Test {
@@ -100,6 +101,7 @@ impl peaq_storage::Config for Test {
     type StorageDepositBase = StorageDepositBase;
     type StorageDepositPerByte = StorageDepositPerByte;
     type Currency = Balances;
+    type BoundedDataLen = BoundedDataLen;
 }
 
 // Build genesis storage according to the mock runtime.
