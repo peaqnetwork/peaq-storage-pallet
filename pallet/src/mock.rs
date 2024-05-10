@@ -26,7 +26,8 @@ parameter_types! {
     pub const BlockHashCount: u64 = 250;
     pub const SS58Prefix: u8 = 42;
     pub const BlockNumber: u64 = 5;
-
+    // I made it bigger to avoid the error for data lenght test
+    pub const BoundedDataLen: u32 = 2560;
 }
 
 impl system::Config for Test {
@@ -63,6 +64,7 @@ parameter_types! {
 impl peaq_storage::Config for Test {
     type RuntimeEvent = RuntimeEvent;
     type WeightInfo = peaq_storage::weights::WeightInfo<Test>;
+    type BoundedDataLen = BoundedDataLen;
 }
 
 // Build genesis storage according to the mock runtime.

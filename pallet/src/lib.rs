@@ -32,6 +32,7 @@ pub mod pallet {
     use frame_support::pallet_prelude::{ValueQuery, *};
     use frame_system::pallet_prelude::*;
     use sp_io::hashing::blake2_256;
+    use sp_runtime::BoundedVec;
     use sp_std::vec::Vec;
 
     /// Configure the pallet by specifying the parameters and types on which it depends.
@@ -41,6 +42,8 @@ pub mod pallet {
         type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
         /// Weight information for extrinsics in this pallet.
         type WeightInfo: WeightInfo;
+        #[pallet::constant]
+        type BoundedDataLen: Get<u32>;
     }
 
     // Pallets use events to inform users when important changes are made.
@@ -49,12 +52,20 @@ pub mod pallet {
     #[pallet::event]
     #[pallet::generate_deposit(pub(super) fn deposit_event)]
     pub enum Event<T: Config> {
-        /// Event emitted when an storage item has been added. [who, item_type, item]
-        ItemAdded(T::AccountId, Vec<u8>, Vec<u8>),
+        /// Event emitted when a storage item has been added. [who, item_type, item]
+        ItemAdded(
+            T::AccountId,
+            BoundedVec<u8, T::BoundedDataLen>,
+            BoundedVec<u8, T::BoundedDataLen>,
+        ),
         /// Event emitted when an item is read successfully
-        ItemRead(Vec<u8>),
+        ItemRead(BoundedVec<u8, T::BoundedDataLen>),
         /// Event emitted when an item has been updated. [who, item_type, item]
-        ItemUpdated(T::AccountId, Vec<u8>, Vec<u8>),
+        ItemUpdated(
+            T::AccountId,
+            BoundedVec<u8, T::BoundedDataLen>,
+            BoundedVec<u8, T::BoundedDataLen>,
+        ),
     }
 
     #[pallet::error]
@@ -104,7 +115,11 @@ pub mod pallet {
         /// Add a new item to the storage
         #[pallet::call_index(0)]
         #[pallet::weight(T::WeightInfo::add_item())]
-        pub fn add_item(origin: OriginFor<T>, item_type: Vec<u8>, item: Vec<u8>) -> DispatchResult {
+        pub fn add_item(
+            origin: OriginFor<T>,
+            item_type: BoundedVec<u8, T::BoundedDataLen>,
+            item: BoundedVec<u8, T::BoundedDataLen>,
+        ) -> DispatchResult {
             // Check that an extrinsic was signed and get the signer
             // This fn returns an error if the extrinsic is not signed
             // https://docs.substrate.io/v3/runtime/origins
@@ -128,8 +143,8 @@ pub mod pallet {
         #[pallet::weight(T::WeightInfo::update_item())]
         pub fn update_item(
             origin: OriginFor<T>,
-            item_type: Vec<u8>,
-            item: Vec<u8>,
+            item_type: BoundedVec<u8, T::BoundedDataLen>,
+            item: BoundedVec<u8, T::BoundedDataLen>,
         ) -> DispatchResult {
             // Check that an extrinsic was signed and get the signer
             // This fn returns an error if the extrinsic is not signed
@@ -151,7 +166,10 @@ pub mod pallet {
         /// Read storage item
         #[pallet::call_index(2)]
         #[pallet::weight(T::WeightInfo::get_item())]
-        pub fn get_item(origin: OriginFor<T>, item_type: Vec<u8>) -> DispatchResult {
+        pub fn get_item(
+            origin: OriginFor<T>,
+            item_type: BoundedVec<u8, T::BoundedDataLen>,
+        ) -> DispatchResult {
             // Check that an extrinsic was signed and get the signer
             // This fn returns an error if the extrinsic is not signed
             // https://docs.substrate.io/v3/runtime/origins
@@ -160,7 +178,7 @@ pub mod pallet {
             let item = Self::read(&sender, &item_type);
             match item {
                 Some(value) => {
-                    Self::deposit_event(Event::ItemRead(value));
+                    Self::deposit_event(Event::ItemRead(BoundedVec::try_from(value).unwrap()));
                 }
                 None => return Err(Error::<T>::ItemNotFound.into()),
             }
