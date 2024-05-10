@@ -19,6 +19,9 @@ pub(crate) const ALICE: AccountId = 1;
 pub(crate) const BOB: AccountId = 2;
 pub(crate) const DAVE: AccountId = 3;
 
+pub(crate) const DEPOSIT_BASE: Balance = 100;
+pub(crate) const DEPOSIT_PER_BYTE: Balance = 2;
+
 // Configure a mock runtime to test the pallet.
 frame_support::construct_runtime!(
     pub enum Test where
@@ -87,13 +90,15 @@ impl pallet_balances::Config for Test {
 }
 parameter_types! {
     pub const MinimumPeriod: u64 = 5;
-    pub const StorageDeposit: Balance = 2;
+    pub const StorageDepositBase: Balance = DEPOSIT_BASE;
+    pub const StorageDepositPerByte: Balance = DEPOSIT_PER_BYTE;
 }
 
 impl peaq_storage::Config for Test {
     type RuntimeEvent = RuntimeEvent;
     type WeightInfo = peaq_storage::weights::WeightInfo<Test>;
-    type StorageDeposit = StorageDeposit;
+    type StorageDepositBase = StorageDepositBase;
+    type StorageDepositPerByte = StorageDepositPerByte;
     type Currency = Balances;
 }
 

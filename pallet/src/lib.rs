@@ -26,6 +26,7 @@ pub use pallet::*;
 
 #[frame_support::pallet]
 pub mod pallet {
+
     use super::WeightInfo;
     use crate::enums::StorageError;
     use crate::traits::*;
@@ -35,7 +36,12 @@ pub mod pallet {
     };
     use frame_system::pallet_prelude::*;
     use sp_io::hashing::blake2_256;
+    use sp_runtime::traits::Saturating;
     use sp_std::vec::Vec;
+
+    pub(super) const MAX_ITEM_SIZE: usize = 256;
+    pub(super) const MAX_ITEM_TYPE_SIZE: usize = 64;
+    pub(super) const MAX_STORAGE_ITEM_SIZE: usize = MAX_ITEM_SIZE + MAX_ITEM_TYPE_SIZE;
 
     pub type AccountIdOf<T> = <T as frame_system::Config>::AccountId;
     pub type BalanceOf<T> = <<T as Config>::Currency as Currency<AccountIdOf<T>>>::Balance;
@@ -48,7 +54,11 @@ pub mod pallet {
         /// Weight information for extrinsics in this pallet.
         type WeightInfo: WeightInfo;
         /// Deposit amount for utilising storage
-        type StorageDeposit: Get<BalanceOf<Self>>;
+        #[pallet::constant]
+        type StorageDepositBase: Get<BalanceOf<Self>>;
+        /// Deposit amount per byte
+        #[pallet::constant]
+        type StorageDepositPerByte: Get<BalanceOf<Self>>;
         /// Currency Type
         type Currency: ReservableCurrency<Self::AccountId>;
     }
@@ -122,12 +132,15 @@ pub mod pallet {
             // https://docs.substrate.io/v3/runtime/origins
             let sender = ensure_signed(origin)?;
 
-            ensure!(item_type.len() <= 64, Error::<T>::ItemTypeExceedMax64);
-            ensure!(item.len() <= 256, Error::<T>::ItemExceedMax256);
+            ensure!(
+                item_type.len() <= MAX_ITEM_TYPE_SIZE,
+                Error::<T>::ItemTypeExceedMax64
+            );
+            ensure!(item.len() <= MAX_ITEM_SIZE, Error::<T>::ItemExceedMax256);
 
+            T::Currency::reserve(&sender, Self::deposit_amount())?;
             match Self::create(&sender, &item_type, &item) {
                 Ok(()) => {
-                    T::Currency::reserve(&sender, T::StorageDeposit::get())?;
                     Self::deposit_event(Event::ItemAdded(sender.clone(), item_type, item));
                 }
                 Err(e) => return Error::<T>::dispatch_error(e),
@@ -150,7 +163,7 @@ pub mod pallet {
             let sender = ensure_signed(origin)?;
 
             // Verify that the item len is 256 max
-            ensure!(item.len() <= 256, Error::<T>::ItemExceedMax256);
+            ensure!(item.len() <= MAX_ITEM_SIZE, Error::<T>::ItemExceedMax256);
 
             match Self::update(&sender.clone(), &item_type, &item) {
                 Ok(()) => {
@@ -189,9 +202,9 @@ pub mod pallet {
             // https://docs.substrate.io/v3/runtime/origins
             let sender = ensure_signed(origin)?;
 
+            T::Currency::unreserve(&sender, Self::deposit_amount());
             match Self::remove(&sender, &item_type) {
                 Ok(()) => {
-                    T::Currency::unreserve(&sender, T::StorageDeposit::get());
                     Self::deposit_event(Event::ItemRemoved(sender.clone(), item_type));
                 }
                 Err(e) => return Error::<T>::dispatch_error(e),
@@ -257,6 +270,15 @@ pub mod pallet {
             let mut bytes_to_hash: Vec<u8> = account.encode().as_slice().to_vec();
             bytes_to_hash.append(&mut bytes_in_value);
             blake2_256(&bytes_to_hash[..])
+        }
+    }
+
+    impl<T: Config> Pallet<T> {
+        pub fn deposit_amount() -> BalanceOf<T> {
+            let mut deposit = T::StorageDepositPerByte::get()
+                .saturating_mul(BalanceOf::<T>::from(MAX_STORAGE_ITEM_SIZE as u32));
+            deposit.saturating_accrue(T::StorageDepositBase::get());
+            deposit
         }
     }
 }

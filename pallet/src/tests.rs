@@ -1,9 +1,12 @@
-use crate::Config;
 use crate::{mock::*, Error};
+use crate::{Config, MAX_STORAGE_ITEM_SIZE};
 use frame_support::{assert_noop, assert_ok};
 
 const ITEM_TYPE: &[u8; 8] = b"itemType";
 const ITEM: &[u8; 4] = b"item";
+
+pub(crate) const EXPECTED_DEPOSIT: Balance =
+    (DEPOSIT_PER_BYTE * MAX_STORAGE_ITEM_SIZE as Balance) + DEPOSIT_BASE;
 
 //Test to add an item
 #[test]
@@ -20,7 +23,7 @@ fn add_item_test_ok() {
         // correct storage deposit was deducted or not
         assert_eq!(
             <Test as Config>::Currency::reserved_balance(&ALICE),
-            StorageDeposit::get()
+            EXPECTED_DEPOSIT
         );
     });
 }
@@ -51,7 +54,7 @@ fn add_item_duplicate_test() {
         // correct storage deposit was deducted or not
         assert_eq!(
             <Test as Config>::Currency::reserved_balance(&ALICE),
-            StorageDeposit::get()
+            EXPECTED_DEPOSIT
         );
     });
 }
@@ -119,6 +122,12 @@ fn update_item_test_ok() {
             ITEM_TYPE.to_vec(),
             b"new_item".to_vec()
         ));
+
+        // correct storage deposit was deducted or not
+        assert_eq!(
+            <Test as Config>::Currency::reserved_balance(&ALICE),
+            EXPECTED_DEPOSIT
+        );
     });
 }
 
@@ -162,6 +171,12 @@ fn update_item_with_item_length_exceed_limit_test() {
             ),
             Error::<Test>::ItemExceedMax256
         );
+
+        // correct storage deposit was deducted or not
+        assert_eq!(
+            <Test as Config>::Currency::reserved_balance(&ALICE),
+            EXPECTED_DEPOSIT
+        );
     });
 }
 
@@ -177,7 +192,11 @@ fn update_other_owner_item_test() {
             ITEM_TYPE.to_vec(),
             ITEM.to_vec()
         ));
-
+        // correct storage deposit was deducted or not
+        assert_eq!(
+            <Test as Config>::Currency::reserved_balance(&ALICE),
+            EXPECTED_DEPOSIT
+        );
         //Update the item with fake owner
         assert_noop!(
             PeaqStorage::update_item(
@@ -187,6 +206,8 @@ fn update_other_owner_item_test() {
             ),
             Error::<Test>::ItemNotFound
         );
+        // correct storage deposit was deducted or not
+        assert_eq!(<Test as Config>::Currency::reserved_balance(&BOB), 0);
     });
 }
 
@@ -265,7 +286,7 @@ fn remove_item_is_ok() {
         ));
         assert_eq!(
             <Test as Config>::Currency::reserved_balance(&ALICE),
-            StorageDeposit::get()
+            EXPECTED_DEPOSIT
         );
 
         //Remove the item
@@ -305,7 +326,7 @@ fn remove_someone_elses_item() {
         ));
         assert_eq!(
             <Test as Config>::Currency::reserved_balance(&ALICE),
-            StorageDeposit::get()
+            EXPECTED_DEPOSIT
         );
 
         //Remove the item
