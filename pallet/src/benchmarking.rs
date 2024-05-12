@@ -6,6 +6,8 @@ use frame_benchmarking::v1::{account, benchmarks};
 use frame_system::{Pallet as System, RawOrigin};
 use sp_runtime::BoundedVec;
 use sp_std::vec;
+use frame_support::traits::Currency;
+use sp_runtime::traits::Bounded;
 
 /// Assert that the last event equals the provided one.
 fn assert_last_event<T: Config>(generic_event: <T as Config>::RuntimeEvent) {
@@ -17,7 +19,7 @@ const CALLER_ACCOUNT_STR: &str = "Iredia1";
 benchmarks! {
     add_item {
         let caller: T::AccountId =  account(CALLER_ACCOUNT_STR,0, 0);
-        // T::Currency::force_set_balance(&caller, 100000.into());
+        let _ = <T as Config>::Currency::make_free_balance_be(&caller, BalanceOf::<T>::max_value());
         let item_type = BoundedVec::try_from(vec![0; 64]).unwrap();
         let item = BoundedVec::try_from(vec![0; 256]).unwrap();
 
@@ -33,6 +35,7 @@ benchmarks! {
         let caller : T::AccountId = account(CALLER_ACCOUNT_STR, 0, 0);
         let item_type = BoundedVec::try_from(vec![0; 64]).unwrap();
         let new_item = BoundedVec::try_from(vec![1; 256]).unwrap();
+        let _ = <T as Config>::Currency::make_free_balance_be(&caller, BalanceOf::<T>::max_value());
 
         <STORAGE<T>>::add_item(
             RawOrigin::Signed(caller.clone()).into(),
@@ -52,6 +55,7 @@ benchmarks! {
         let caller : T::AccountId = account(CALLER_ACCOUNT_STR, 0, 0);
         let item_type = BoundedVec::try_from(vec![0; 64]).unwrap();
         let item = BoundedVec::try_from(vec![1; 256]).unwrap();
+        let _ = <T as Config>::Currency::make_free_balance_be(&caller, BalanceOf::<T>::max_value());
 
         <STORAGE<T>>::add_item(
             RawOrigin::Signed(caller.clone()).into(),
@@ -68,6 +72,7 @@ benchmarks! {
     remove_item {
         let caller : T::AccountId = account(CALLER_ACCOUNT_STR, 0, 0);
         let item_type = BoundedVec::try_from(vec![0; 64]).unwrap();
+        let _ = <T as Config>::Currency::make_free_balance_be(&caller, BalanceOf::<T>::max_value());
 
         <STORAGE<T>>::add_item(
             RawOrigin::Signed(caller.clone()).into(),

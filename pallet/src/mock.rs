@@ -108,9 +108,9 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
     // This will cause some initial issuance
     pallet_balances::GenesisConfig::<Test> {
         balances: vec![
-            (account_key("Iredia1"), 1400000000000000000000000000),
-            (account_key("Iredia2"), 1400000000000000000000000000),
-            (account_key("Iredia3"), 1400000000000000000000000000),
+            (account_key("Iredia1"), 1_400_000_000_000_000_000_000_000_000),
+            (account_key("Iredia2"), 1_400_000_000_000_000_000_000_000_000),
+            (account_key("Iredia3"), 1_400_000_000_000_000_000_000_000_000),
         ],
     }
     .assimilate_storage(&mut storage)
