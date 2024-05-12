@@ -212,7 +212,7 @@ pub mod pallet {
 
         /// Read storage item
         #[pallet::call_index(3)]
-        #[pallet::weight(T::WeightInfo::get_item())]
+        #[pallet::weight(T::WeightInfo::remove_item())]
         pub fn remove_item(
             origin: OriginFor<T>,
             item_type: BoundedVec<u8, T::BoundedDataLen>,

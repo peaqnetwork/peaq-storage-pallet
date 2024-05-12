@@ -64,6 +64,23 @@ benchmarks! {
         ).into());
     }
 
+    remove_item {
+        let caller : T::AccountId = account(CALLER_ACCOUNT_STR, 0, 0);
+        let item_type = BoundedVec::try_from(vec![0; 64]).unwrap();
+
+        <STORAGE<T>>::add_item(
+            RawOrigin::Signed(caller.clone()).into(),
+            item_type.clone())?;
+
+    }: _(RawOrigin::Signed(caller.clone()), item_type)
+    verify {
+        assert_last_event::<T>(Event::<T>::ItemRemoved(
+            caller.into(),
+            item_type,
+            item,
+        ).into());
+    }
+
     impl_benchmark_test_suite!(
         STORAGE,
         crate::mock::new_test_ext(),

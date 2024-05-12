@@ -66,4 +66,8 @@ impl<T: frame_system::Config> crate::WeightInfo for WeightInfo<T> {
 			.saturating_add(Weight::from_parts(0, 3876))
 			.saturating_add(T::DbWeight::get().reads(1))
 	}
+
+	fn remove_item() -> Weight {
+		Default::default()
+	}
 }
