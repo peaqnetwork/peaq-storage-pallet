@@ -3,11 +3,11 @@
 use super::*;
 use crate::Pallet as STORAGE;
 use frame_benchmarking::v1::{account, benchmarks};
+use frame_support::traits::Currency;
 use frame_system::{Pallet as System, RawOrigin};
+use sp_runtime::traits::Bounded;
 use sp_runtime::BoundedVec;
 use sp_std::vec;
-use frame_support::traits::Currency;
-use sp_runtime::traits::Bounded;
 
 /// Assert that the last event equals the provided one.
 fn assert_last_event<T: Config>(generic_event: <T as Config>::RuntimeEvent) {
