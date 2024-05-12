@@ -1,6 +1,6 @@
 use crate as peaq_storage;
 use frame_support::parameter_types;
-use sp_core::H256;
+use sp_core::{sr25519, Pair, H256};
 use sp_io::TestExternalities;
 use sp_runtime::{
     testing::Header,
@@ -10,14 +10,9 @@ use sp_runtime::{
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
 pub(crate) type Balance = u128;
-pub(crate) type AccountId = u64;
+pub(crate) type AccountId = sr25519::Public;
 pub(crate) const EXISTENTIAL_DEPOSIT: Balance = 2;
 pub(crate) type BlockNumber = u64;
-
-// test accounts
-pub(crate) const ALICE: AccountId = 1;
-pub(crate) const BOB: AccountId = 2;
-pub(crate) const DAVE: AccountId = 3;
 
 pub(crate) const DEPOSIT_BASE: Balance = 100;
 pub(crate) const DEPOSIT_PER_BYTE: Balance = 2;
@@ -113,9 +108,9 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
     // This will cause some initial issuance
     pallet_balances::GenesisConfig::<Test> {
         balances: vec![
-            (ALICE, 1400000000000000000000000000),
-            (BOB, 1400000000000000000000000000),
-            (DAVE, 1400000000000000000000000000),
+            (account_key("Iredia1"), 1400000000000000000000000000),
+            (account_key("Iredia2"), 1400000000000000000000000000),
+            (account_key("Iredia3"), 1400000000000000000000000000),
         ],
     }
     .assimilate_storage(&mut storage)
@@ -124,4 +119,10 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
     let mut ext = TestExternalities::from(storage);
     ext.execute_with(|| System::set_block_number(1));
     ext
+}
+
+pub fn account_key(s: &str) -> sr25519::Public {
+    sr25519::Pair::from_string(&format!("//{}", s), None)
+        .expect("static values are valid; qed")
+        .public()
 }

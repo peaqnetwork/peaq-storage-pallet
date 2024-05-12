@@ -17,6 +17,7 @@ const CALLER_ACCOUNT_STR: &str = "Iredia1";
 benchmarks! {
     add_item {
         let caller: T::AccountId =  account(CALLER_ACCOUNT_STR,0, 0);
+        // T::Currency::force_set_balance(&caller, 100000.into());
         let item_type = BoundedVec::try_from(vec![0; 64]).unwrap();
         let item = BoundedVec::try_from(vec![0; 256]).unwrap();
 
@@ -70,14 +71,14 @@ benchmarks! {
 
         <STORAGE<T>>::add_item(
             RawOrigin::Signed(caller.clone()).into(),
-            item_type.clone())?;
+            item_type.clone(),
+            BoundedVec::try_from(vec![0;256]).unwrap())?;
 
-    }: _(RawOrigin::Signed(caller.clone()), item_type)
+    }: _(RawOrigin::Signed(caller.clone()), item_type.clone())
     verify {
         assert_last_event::<T>(Event::<T>::ItemRemoved(
             caller.into(),
             item_type,
-            item,
         ).into());
     }
 

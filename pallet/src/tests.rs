@@ -13,17 +13,18 @@ pub(crate) const EXPECTED_DEPOSIT: Balance =
 #[test]
 fn add_item_test_ok() {
     new_test_ext().execute_with(|| {
+        let alice: AccountId = account_key("Iredia1");
         System::set_block_number(1);
 
         assert_ok!(PeaqStorage::add_item(
-            RuntimeOrigin::signed(ALICE),
+            RuntimeOrigin::signed(alice),
             BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
             BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
 
         // correct storage deposit was deducted or not
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&ALICE),
+            <Test as Config>::Currency::reserved_balance(&alice),
             EXPECTED_DEPOSIT
         );
     });
@@ -33,11 +34,12 @@ fn add_item_test_ok() {
 #[test]
 fn add_item_duplicate_test() {
     new_test_ext().execute_with(|| {
+        let alice: AccountId = account_key("Iredia1");
         System::set_block_number(1);
 
         //Add an item
         assert_ok!(PeaqStorage::add_item(
-            RuntimeOrigin::signed(ALICE),
+            RuntimeOrigin::signed(alice),
             BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
             BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
@@ -45,7 +47,7 @@ fn add_item_duplicate_test() {
         //Add the same item again
         assert_noop!(
             PeaqStorage::add_item(
-                RuntimeOrigin::signed(ALICE),
+                RuntimeOrigin::signed(alice),
                 BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
                 BoundedVec::try_from(ITEM.to_vec()).unwrap()
             ),
@@ -54,7 +56,7 @@ fn add_item_duplicate_test() {
 
         // correct storage deposit was deducted or not
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&ALICE),
+            <Test as Config>::Currency::reserved_balance(&alice),
             EXPECTED_DEPOSIT
         );
     });
@@ -64,13 +66,14 @@ fn add_item_duplicate_test() {
 #[test]
 fn add_item_type_length_exceeds_limit_test() {
     new_test_ext().execute_with(|| {
+        let alice: AccountId = account_key("Iredia1");
         System::set_block_number(1);
 
         let invalid_item_typ = ITEM_TYPE.repeat(9);
 
         assert_noop!(
             PeaqStorage::add_item(
-                RuntimeOrigin::signed(ALICE),
+                RuntimeOrigin::signed(alice),
                 BoundedVec::try_from(invalid_item_typ.to_vec()).unwrap(),
                 BoundedVec::try_from(ITEM.to_vec()).unwrap()
             ),
@@ -78,7 +81,7 @@ fn add_item_type_length_exceeds_limit_test() {
         );
 
         // no deposit deducted
-        assert_eq!(<Test as Config>::Currency::reserved_balance(&ALICE), 0);
+        assert_eq!(<Test as Config>::Currency::reserved_balance(&alice), 0);
     });
 }
 
@@ -86,13 +89,14 @@ fn add_item_type_length_exceeds_limit_test() {
 #[test]
 fn add_item_length_exceeds_limit_test() {
     new_test_ext().execute_with(|| {
+        let alice: AccountId = account_key("Iredia1");
         System::set_block_number(1);
 
         let invalid_item = ITEM.repeat(66);
 
         assert_noop!(
             PeaqStorage::add_item(
-                RuntimeOrigin::signed(ALICE),
+                RuntimeOrigin::signed(alice),
                 BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
                 BoundedVec::try_from(invalid_item.to_vec()).unwrap()
             ),
@@ -100,7 +104,7 @@ fn add_item_length_exceeds_limit_test() {
         );
 
         // no deposit deducted
-        assert_eq!(<Test as Config>::Currency::reserved_balance(&ALICE), 0);
+        assert_eq!(<Test as Config>::Currency::reserved_balance(&alice), 0);
     });
 }
 
@@ -108,25 +112,26 @@ fn add_item_length_exceeds_limit_test() {
 #[test]
 fn update_item_test_ok() {
     new_test_ext().execute_with(|| {
+        let alice: AccountId = account_key("Iredia1");
         System::set_block_number(1);
 
         //Add an item
         assert_ok!(PeaqStorage::add_item(
-            RuntimeOrigin::signed(ALICE),
+            RuntimeOrigin::signed(alice),
             BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
             BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
 
         //update item
         assert_ok!(PeaqStorage::update_item(
-            RuntimeOrigin::signed(ALICE),
+            RuntimeOrigin::signed(alice),
             BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
             BoundedVec::try_from(b"new_item".to_vec()).unwrap()
         ));
 
         // correct storage deposit was deducted or not
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&ALICE),
+            <Test as Config>::Currency::reserved_balance(&alice),
             EXPECTED_DEPOSIT
         );
     });
@@ -136,11 +141,12 @@ fn update_item_test_ok() {
 #[test]
 fn update_non_existing_item_test() {
     new_test_ext().execute_with(|| {
+        let alice: AccountId = account_key("Iredia1");
         System::set_block_number(1);
 
         assert_noop!(
             PeaqStorage::update_item(
-                RuntimeOrigin::signed(ALICE),
+                RuntimeOrigin::signed(alice),
                 BoundedVec::try_from(b"new_item_type".to_vec()).unwrap(),
                 BoundedVec::try_from(b"new_item".to_vec()).unwrap()
             ),
@@ -152,13 +158,14 @@ fn update_non_existing_item_test() {
 #[test]
 fn update_item_with_item_length_exceed_limit_test() {
     new_test_ext().execute_with(|| {
+        let alice: AccountId = account_key("Iredia1");
         System::set_block_number(1);
 
         let invalid_item = ITEM.repeat(66);
 
         //Add an item
         assert_ok!(PeaqStorage::add_item(
-            RuntimeOrigin::signed(ALICE),
+            RuntimeOrigin::signed(alice),
             BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
             BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
@@ -166,7 +173,7 @@ fn update_item_with_item_length_exceed_limit_test() {
         //Update the item with item length exceed the limit
         assert_noop!(
             PeaqStorage::update_item(
-                RuntimeOrigin::signed(ALICE),
+                RuntimeOrigin::signed(alice),
                 BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
                 BoundedVec::try_from(invalid_item.to_vec()).unwrap()
             ),
@@ -175,7 +182,7 @@ fn update_item_with_item_length_exceed_limit_test() {
 
         // correct storage deposit was deducted or not
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&ALICE),
+            <Test as Config>::Currency::reserved_balance(&alice),
             EXPECTED_DEPOSIT
         );
     });
@@ -185,30 +192,32 @@ fn update_item_with_item_length_exceed_limit_test() {
 //Test to update an other owner's item
 fn update_other_owner_item_test() {
     new_test_ext().execute_with(|| {
+        let alice: AccountId = account_key("Iredia1");
+        let bob: AccountId = account_key("Iredia2");
         System::set_block_number(1);
 
         //Add an item with user Iredia
         assert_ok!(PeaqStorage::add_item(
-            RuntimeOrigin::signed(ALICE),
+            RuntimeOrigin::signed(alice),
             BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
             BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
         // correct storage deposit was deducted or not
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&ALICE),
+            <Test as Config>::Currency::reserved_balance(&alice),
             EXPECTED_DEPOSIT
         );
         //Update the item with fake owner
         assert_noop!(
             PeaqStorage::update_item(
-                RuntimeOrigin::signed(BOB),
+                RuntimeOrigin::signed(bob),
                 BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
                 BoundedVec::try_from(ITEM.to_vec()).unwrap()
             ),
             Error::<Test>::ItemNotFound
         );
         // correct storage deposit was deducted or not
-        assert_eq!(<Test as Config>::Currency::reserved_balance(&BOB), 0);
+        assert_eq!(<Test as Config>::Currency::reserved_balance(&bob), 0);
     });
 }
 
@@ -216,18 +225,19 @@ fn update_other_owner_item_test() {
 #[test]
 fn get_item_test_ok() {
     new_test_ext().execute_with(|| {
+        let alice: AccountId = account_key("Iredia1");
         System::set_block_number(1);
 
         //Add an item
         assert_ok!(PeaqStorage::add_item(
-            RuntimeOrigin::signed(ALICE),
+            RuntimeOrigin::signed(alice),
             BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
             BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
 
         //Get the same item
         assert_ok!(PeaqStorage::get_item(
-            RuntimeOrigin::signed(ALICE),
+            RuntimeOrigin::signed(alice),
             BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap()
         ));
     });
@@ -237,10 +247,11 @@ fn get_item_test_ok() {
 #[test]
 fn get_non_existing_item_test() {
     new_test_ext().execute_with(|| {
+        let alice: AccountId = account_key("Iredia1");
         System::set_block_number(1);
 
         assert_ok!(PeaqStorage::add_item(
-            RuntimeOrigin::signed(ALICE),
+            RuntimeOrigin::signed(alice),
             BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
             BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
@@ -248,7 +259,7 @@ fn get_non_existing_item_test() {
         //Get a non existing item
         assert_noop!(
             PeaqStorage::get_item(
-                RuntimeOrigin::signed(ALICE),
+                RuntimeOrigin::signed(alice),
                 BoundedVec::try_from(b"new_item_type".to_vec()).unwrap()
             ),
             Error::<Test>::ItemNotFound
@@ -260,11 +271,14 @@ fn get_non_existing_item_test() {
 #[test]
 fn get_other_owner_item_test() {
     new_test_ext().execute_with(|| {
+        let alice: AccountId = account_key("Iredia1");
+        let bob: AccountId = account_key("Iredia2");
+
         System::set_block_number(1);
 
         //Add an item
         assert_ok!(PeaqStorage::add_item(
-            RuntimeOrigin::signed(ALICE),
+            RuntimeOrigin::signed(alice),
             BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
             BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
@@ -272,7 +286,7 @@ fn get_other_owner_item_test() {
         //Get anotehr owner's item
         assert_noop!(
             PeaqStorage::get_item(
-                RuntimeOrigin::signed(BOB),
+                RuntimeOrigin::signed(bob),
                 BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap()
             ),
             Error::<Test>::ItemNotFound
@@ -283,70 +297,74 @@ fn get_other_owner_item_test() {
 #[test]
 fn remove_item_is_ok() {
     new_test_ext().execute_with(|| {
+        let alice: AccountId = account_key("Iredia1");
         System::set_block_number(1);
 
         //Add an item
         assert_ok!(PeaqStorage::add_item(
-            RuntimeOrigin::signed(ALICE),
+            RuntimeOrigin::signed(alice),
             BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
             BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&ALICE),
+            <Test as Config>::Currency::reserved_balance(&alice),
             EXPECTED_DEPOSIT
         );
 
         //Remove the item
         assert_ok!(PeaqStorage::remove_item(
-            RuntimeOrigin::signed(ALICE),
+            RuntimeOrigin::signed(alice),
             BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap()
         ));
 
-        assert_eq!(<Test as Config>::Currency::reserved_balance(&ALICE), 0);
+        assert_eq!(<Test as Config>::Currency::reserved_balance(&alice), 0);
     });
 }
 
 #[test]
 fn remove_non_existing_item() {
     new_test_ext().execute_with(|| {
+        let alice: AccountId = account_key("Iredia1");
         System::set_block_number(1);
 
         //Remove the item
         assert_noop!(
             PeaqStorage::remove_item(
-                RuntimeOrigin::signed(ALICE),
+                RuntimeOrigin::signed(alice),
                 BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap()
             ),
             Error::<Test>::ItemNotFound
         );
-        assert_eq!(<Test as Config>::Currency::reserved_balance(&ALICE), 0);
+        assert_eq!(<Test as Config>::Currency::reserved_balance(&alice), 0);
     });
 }
 
 #[test]
 fn remove_someone_elses_item() {
     new_test_ext().execute_with(|| {
+        let alice: AccountId = account_key("Iredia1");
+        let bob: AccountId = account_key("Iredia2");
         System::set_block_number(1);
 
         //Add an item
         assert_ok!(PeaqStorage::add_item(
-            RuntimeOrigin::signed(ALICE),
+            RuntimeOrigin::signed(alice),
             BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap(),
             BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&ALICE),
+            <Test as Config>::Currency::reserved_balance(&alice),
             EXPECTED_DEPOSIT
         );
 
         //Remove the item
         assert_noop!(
             PeaqStorage::remove_item(
-                RuntimeOrigin::signed(BOB),
+                RuntimeOrigin::signed(bob),
                 BoundedVec::try_from(ITEM.to_vec()).unwrap()
             ),
             Error::<Test>::ItemNotFound
         );
-        assert_eq!(<Test as Config>::Currency::reserved_balance(&BOB), 0);
+        assert_eq!(<Test as Config>::Currency::reserved_balance(&bob), 0);
     });
 }
