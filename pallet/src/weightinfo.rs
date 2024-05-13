@@ -6,4 +6,5 @@ pub trait WeightInfo {
     fn add_item() -> Weight;
     fn update_item() -> Weight;
     fn get_item() -> Weight;
+    fn remove_item() -> Weight;
 }

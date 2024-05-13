@@ -26,14 +26,26 @@ pub use pallet::*;
 
 #[frame_support::pallet]
 pub mod pallet {
+
     use super::WeightInfo;
     use crate::enums::StorageError;
     use crate::traits::*;
-    use frame_support::pallet_prelude::{ValueQuery, *};
+    use frame_support::{
+        pallet_prelude::{ValueQuery, *},
+        traits::{Currency, ReservableCurrency},
+    };
     use frame_system::pallet_prelude::*;
     use sp_io::hashing::blake2_256;
+    use sp_runtime::traits::Saturating;
     use sp_runtime::BoundedVec;
     use sp_std::vec::Vec;
+
+    pub(super) const MAX_ITEM_SIZE: usize = 256;
+    pub(super) const MAX_ITEM_TYPE_SIZE: usize = 64;
+    pub(super) const MAX_STORAGE_ITEM_SIZE: usize = MAX_ITEM_SIZE + MAX_ITEM_TYPE_SIZE;
+
+    pub type AccountIdOf<T> = <T as frame_system::Config>::AccountId;
+    pub type BalanceOf<T> = <<T as Config>::Currency as Currency<AccountIdOf<T>>>::Balance;
 
     /// Configure the pallet by specifying the parameters and types on which it depends.
     #[pallet::config]
@@ -44,6 +56,14 @@ pub mod pallet {
         type WeightInfo: WeightInfo;
         #[pallet::constant]
         type BoundedDataLen: Get<u32>;
+        /// Deposit amount for utilising storage
+        #[pallet::constant]
+        type StorageDepositBase: Get<BalanceOf<Self>>;
+        /// Deposit amount per byte
+        #[pallet::constant]
+        type StorageDepositPerByte: Get<BalanceOf<Self>>;
+        /// Currency Type
+        type Currency: ReservableCurrency<Self::AccountId>;
     }
 
     // Pallets use events to inform users when important changes are made.
@@ -66,6 +86,7 @@ pub mod pallet {
             BoundedVec<u8, T::BoundedDataLen>,
             BoundedVec<u8, T::BoundedDataLen>,
         ),
+        ItemRemoved(T::AccountId, BoundedVec<u8, T::BoundedDataLen>),
     }
 
     #[pallet::error]
@@ -125,12 +146,16 @@ pub mod pallet {
             // https://docs.substrate.io/v3/runtime/origins
             let sender = ensure_signed(origin)?;
 
-            ensure!(item_type.len() <= 64, Error::<T>::ItemTypeExceedMax64);
-            ensure!(item.len() <= 256, Error::<T>::ItemExceedMax256);
+            ensure!(
+                item_type.len() <= MAX_ITEM_TYPE_SIZE,
+                Error::<T>::ItemTypeExceedMax64
+            );
+            ensure!(item.len() <= MAX_ITEM_SIZE, Error::<T>::ItemExceedMax256);
 
+            T::Currency::reserve(&sender, Self::deposit_amount())?;
             match Self::create(&sender, &item_type, &item) {
                 Ok(()) => {
-                    Self::deposit_event(Event::ItemAdded(sender, item_type, item));
+                    Self::deposit_event(Event::ItemAdded(sender.clone(), item_type, item));
                 }
                 Err(e) => return Error::<T>::dispatch_error(e),
             };
@@ -152,11 +177,11 @@ pub mod pallet {
             let sender = ensure_signed(origin)?;
 
             // Verify that the item len is 256 max
-            ensure!(item.len() <= 256, Error::<T>::ItemExceedMax256);
+            ensure!(item.len() <= MAX_ITEM_SIZE, Error::<T>::ItemExceedMax256);
 
-            match Self::update(&sender, &item_type, &item) {
+            match Self::update(&sender.clone(), &item_type, &item) {
                 Ok(()) => {
-                    Self::deposit_event(Event::ItemUpdated(sender, item_type, item));
+                    Self::deposit_event(Event::ItemUpdated(sender.clone(), item_type, item));
                 }
                 Err(e) => return Error::<T>::dispatch_error(e),
             };
@@ -181,6 +206,28 @@ pub mod pallet {
                     Self::deposit_event(Event::ItemRead(BoundedVec::try_from(value).unwrap()));
                 }
                 None => return Err(Error::<T>::ItemNotFound.into()),
+            }
+            Ok(())
+        }
+
+        /// Read storage item
+        #[pallet::call_index(3)]
+        #[pallet::weight(T::WeightInfo::remove_item())]
+        pub fn remove_item(
+            origin: OriginFor<T>,
+            item_type: BoundedVec<u8, T::BoundedDataLen>,
+        ) -> DispatchResult {
+            // Check that an extrinsic was signed and get the signer
+            // This fn returns an error if the extrinsic is not signed
+            // https://docs.substrate.io/v3/runtime/origins
+            let sender = ensure_signed(origin)?;
+
+            T::Currency::unreserve(&sender, Self::deposit_amount());
+            match Self::remove(&sender, &item_type) {
+                Ok(()) => {
+                    Self::deposit_event(Event::ItemRemoved(sender.clone(), item_type));
+                }
+                Err(e) => return Error::<T>::dispatch_error(e),
             }
             Ok(())
         }
@@ -226,11 +273,32 @@ pub mod pallet {
             None
         }
 
+        fn remove(owner: &T::AccountId, item_type: &[u8]) -> Result<(), StorageError> {
+            let id = Self::get_hashed_key(owner, item_type);
+
+            // Check if item exists with the given account and item_type
+            if !<ItemStore<T>>::contains_key(id) {
+                return Err(StorageError::NotFound);
+            }
+
+            <ItemStore<T>>::remove(id);
+            Ok(())
+        }
+
         fn get_hashed_key(account: &T::AccountId, value: &[u8]) -> [u8; 32] {
             let mut bytes_in_value: Vec<u8> = value.to_vec();
             let mut bytes_to_hash: Vec<u8> = account.encode().as_slice().to_vec();
             bytes_to_hash.append(&mut bytes_in_value);
             blake2_256(&bytes_to_hash[..])
+        }
+    }
+
+    impl<T: Config> Pallet<T> {
+        pub fn deposit_amount() -> BalanceOf<T> {
+            let mut deposit = T::StorageDepositPerByte::get()
+                .saturating_mul(BalanceOf::<T>::from(MAX_STORAGE_ITEM_SIZE as u32));
+            deposit.saturating_accrue(T::StorageDepositBase::get());
+            deposit
         }
     }
 }

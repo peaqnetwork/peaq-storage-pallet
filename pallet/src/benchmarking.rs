@@ -3,7 +3,9 @@
 use super::*;
 use crate::Pallet as STORAGE;
 use frame_benchmarking::v1::{account, benchmarks};
+use frame_support::traits::Currency;
 use frame_system::{Pallet as System, RawOrigin};
+use sp_runtime::traits::Bounded;
 use sp_runtime::BoundedVec;
 use sp_std::vec;
 
@@ -17,6 +19,7 @@ const CALLER_ACCOUNT_STR: &str = "Iredia1";
 benchmarks! {
     add_item {
         let caller: T::AccountId =  account(CALLER_ACCOUNT_STR,0, 0);
+        let _ = <T as Config>::Currency::make_free_balance_be(&caller, BalanceOf::<T>::max_value());
         let item_type = BoundedVec::try_from(vec![0; 64]).unwrap();
         let item = BoundedVec::try_from(vec![0; 256]).unwrap();
 
@@ -32,6 +35,7 @@ benchmarks! {
         let caller : T::AccountId = account(CALLER_ACCOUNT_STR, 0, 0);
         let item_type = BoundedVec::try_from(vec![0; 64]).unwrap();
         let new_item = BoundedVec::try_from(vec![1; 256]).unwrap();
+        let _ = <T as Config>::Currency::make_free_balance_be(&caller, BalanceOf::<T>::max_value());
 
         <STORAGE<T>>::add_item(
             RawOrigin::Signed(caller.clone()).into(),
@@ -51,6 +55,7 @@ benchmarks! {
         let caller : T::AccountId = account(CALLER_ACCOUNT_STR, 0, 0);
         let item_type = BoundedVec::try_from(vec![0; 64]).unwrap();
         let item = BoundedVec::try_from(vec![1; 256]).unwrap();
+        let _ = <T as Config>::Currency::make_free_balance_be(&caller, BalanceOf::<T>::max_value());
 
         <STORAGE<T>>::add_item(
             RawOrigin::Signed(caller.clone()).into(),
@@ -61,6 +66,24 @@ benchmarks! {
     verify {
         assert_last_event::<T>(Event::<T>::ItemRead (
             item,
+        ).into());
+    }
+
+    remove_item {
+        let caller : T::AccountId = account(CALLER_ACCOUNT_STR, 0, 0);
+        let item_type = BoundedVec::try_from(vec![0; 64]).unwrap();
+        let _ = <T as Config>::Currency::make_free_balance_be(&caller, BalanceOf::<T>::max_value());
+
+        <STORAGE<T>>::add_item(
+            RawOrigin::Signed(caller.clone()).into(),
+            item_type.clone(),
+            BoundedVec::try_from(vec![0;256]).unwrap())?;
+
+    }: _(RawOrigin::Signed(caller.clone()), item_type.clone())
+    verify {
+        assert_last_event::<T>(Event::<T>::ItemRemoved(
+            caller.into(),
+            item_type,
         ).into());
     }
 

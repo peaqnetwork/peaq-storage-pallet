@@ -66,4 +66,19 @@ impl<T: frame_system::Config> crate::WeightInfo for WeightInfo<T> {
 			.saturating_add(Weight::from_parts(0, 3876))
 			.saturating_add(T::DbWeight::get().reads(1))
 	}
+
+	/// Storage: System Account (r:1 w:1)
+	/// Proof: System Account (max_values: None, max_size: Some(128), added: 2603, mode: MaxEncodedLen)
+	/// Storage: PeaqStorage ItemStore (r:1 w:1)
+	/// Proof Skipped: PeaqStorage ItemStore (max_values: None, max_size: None, mode: Measured)
+	fn remove_item() -> Weight {
+		// Proof Size summary in bytes:
+		//  Measured:  `359`
+		//  Estimated: `3824`
+		// Minimum execution time: 14_000_000 picoseconds.
+		Weight::from_parts(15_000_000, 0)
+			.saturating_add(Weight::from_parts(0, 3824))
+			.saturating_add(T::DbWeight::get().reads(2))
+			.saturating_add(T::DbWeight::get().writes(2))
+	}
 }
