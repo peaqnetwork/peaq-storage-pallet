@@ -138,4 +138,3 @@ pub fn account_key(s: &str) -> sr25519::Public {
         .expect("static values are valid; qed")
         .public()
 }
-

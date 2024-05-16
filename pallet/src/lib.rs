@@ -50,7 +50,6 @@ pub mod pallet {
         <T as frame_system::Config>::AccountId,
     >>::ReserveIdentifier;
 
-
     /// Configure the pallet by specifying the parameters and types on which it depends.
     #[pallet::config]
     pub trait Config: frame_system::Config {
@@ -162,7 +161,8 @@ pub mod pallet {
             T::Currency::reserve_named(
                 &T::ReserveIdentifier::get(),
                 &sender,
-                Self::deposit_amount())?;
+                Self::deposit_amount(),
+            )?;
 
             match Self::create(&sender, &item_type, &item) {
                 Ok(()) => {
@@ -235,7 +235,9 @@ pub mod pallet {
 
             T::Currency::unreserve_named(
                 &T::ReserveIdentifier::get(),
-                &sender, Self::deposit_amount());
+                &sender,
+                Self::deposit_amount(),
+            );
 
             match Self::remove(&sender, &item_type) {
                 Ok(()) => {
