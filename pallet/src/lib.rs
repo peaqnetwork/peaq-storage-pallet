@@ -32,7 +32,7 @@ pub mod pallet {
     use crate::traits::*;
     use frame_support::{
         pallet_prelude::{ValueQuery, *},
-        traits::{Currency, ReservableCurrency},
+        traits::{Currency, NamedReservableCurrency},
     };
     use frame_system::pallet_prelude::*;
     use sp_io::hashing::blake2_256;
@@ -46,6 +46,10 @@ pub mod pallet {
 
     pub type AccountIdOf<T> = <T as frame_system::Config>::AccountId;
     pub type BalanceOf<T> = <<T as Config>::Currency as Currency<AccountIdOf<T>>>::Balance;
+    pub type ReserveIdentifierOf<T> = <<T as Config>::Currency as NamedReservableCurrency<
+        <T as frame_system::Config>::AccountId,
+    >>::ReserveIdentifier;
+
 
     /// Configure the pallet by specifying the parameters and types on which it depends.
     #[pallet::config]
@@ -63,7 +67,10 @@ pub mod pallet {
         #[pallet::constant]
         type StorageDepositPerByte: Get<BalanceOf<Self>>;
         /// Currency Type
-        type Currency: ReservableCurrency<Self::AccountId>;
+        type Currency: NamedReservableCurrency<Self::AccountId>;
+        /// Reserve identifier
+        #[pallet::constant]
+        type ReserveIdentifier: Get<ReserveIdentifierOf<Self>>;
     }
 
     // Pallets use events to inform users when important changes are made.
@@ -152,7 +159,11 @@ pub mod pallet {
             );
             ensure!(item.len() <= MAX_ITEM_SIZE, Error::<T>::ItemExceedMax256);
 
-            T::Currency::reserve(&sender, Self::deposit_amount())?;
+            T::Currency::reserve_named(
+                &T::ReserveIdentifier::get(),
+                &sender,
+                Self::deposit_amount())?;
+
             match Self::create(&sender, &item_type, &item) {
                 Ok(()) => {
                     Self::deposit_event(Event::ItemAdded(sender.clone(), item_type, item));
@@ -222,7 +233,10 @@ pub mod pallet {
             // https://docs.substrate.io/v3/runtime/origins
             let sender = ensure_signed(origin)?;
 
-            T::Currency::unreserve(&sender, Self::deposit_amount());
+            T::Currency::unreserve_named(
+                &T::ReserveIdentifier::get(),
+                &sender, Self::deposit_amount());
+
             match Self::remove(&sender, &item_type) {
                 Ok(()) => {
                     Self::deposit_event(Event::ItemRemoved(sender.clone(), item_type));
