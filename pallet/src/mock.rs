@@ -66,12 +66,13 @@ impl frame_system::Config for Test {
 
 parameter_types! {
     pub const MaxLocks: u32 = 4;
+    pub const MaxReserves: u32 = 4;
     pub const ExistentialDeposit: Balance = EXISTENTIAL_DEPOSIT;
 }
 
 impl pallet_balances::Config for Test {
     type MaxLocks = MaxLocks;
-    type MaxReserves = ();
+    type MaxReserves = MaxReserves;
     type ReserveIdentifier = [u8; 8];
     type Balance = Balance;
     type RuntimeEvent = RuntimeEvent;
@@ -88,6 +89,7 @@ parameter_types! {
     pub const MinimumPeriod: u64 = 5;
     pub const StorageDepositBase: Balance = DEPOSIT_BASE;
     pub const StorageDepositPerByte: Balance = DEPOSIT_PER_BYTE;
+    pub const StorageReserveIdentifier: [u8; 8] = [b'p', b'e', b'a', b'q', b'_', b's', b't', b'o'];
 }
 
 impl peaq_storage::Config for Test {
@@ -97,6 +99,7 @@ impl peaq_storage::Config for Test {
     type StorageDepositPerByte = StorageDepositPerByte;
     type Currency = Balances;
     type BoundedDataLen = BoundedDataLen;
+    type ReserveIdentifier = StorageReserveIdentifier;
 }
 
 // Build genesis storage according to the mock runtime.
