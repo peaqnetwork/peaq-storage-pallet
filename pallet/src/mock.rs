@@ -1,11 +1,9 @@
 use crate as peaq_storage;
 use frame_support::parameter_types;
 use sp_core::{sr25519, Pair, H256};
-use sp_runtime::BuildStorage;
 use sp_io::TestExternalities;
-use sp_runtime::{
-    traits::{BlakeTwo256, IdentityLookup},
-};
+use sp_runtime::traits::{BlakeTwo256, IdentityLookup};
+use sp_runtime::BuildStorage;
 
 type Block = frame_system::mocking::MockBlock<Test>;
 pub(crate) type Balance = u128;
