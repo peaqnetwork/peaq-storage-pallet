@@ -22,6 +22,7 @@ sp-core = { default-features = false, workspace = true }
 sp-io = { default-features = false, workspace = true }
 sp-std = { default-features = false, workspace = true }
 frame-benchmarking = { default-features = false, optional = true, workspace = true }
+pallet-balances = { default-features = false, workspace = true }
 
 [dev-dependencies]
 hex-literal = { workspace = true }
@@ -39,6 +40,6 @@ std = [
     "sp-std/std",
 	"sp-io/std",
     "sp-core/std",
-	
+	"pallet-balances/std"
 ]
 try-runtime = ["frame-support/try-runtime"]

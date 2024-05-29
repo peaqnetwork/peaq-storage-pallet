@@ -23,6 +23,7 @@ frame-benchmarking = { default-features = false, git = "https://github.com/peaqn
 sp-api = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
 sp-blockchain = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
 sp-rpc = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
+pallet-balances = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
 
 serde = "1.0.136"
 jsonrpc-core = "18.0.0"

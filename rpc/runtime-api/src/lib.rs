@@ -6,7 +6,6 @@
 
 use parity_scale_codec::Codec;
 use sp_std::vec::Vec;
-// use peaq_pallet_storage::structs::UserAttribute;
 
 sp_api::decl_runtime_apis! {
     pub trait PeaqStorageApi<AccountId> where
