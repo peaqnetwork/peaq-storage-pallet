@@ -263,7 +263,8 @@ pub mod pallet {
                 return Err(StorageError::AlreadyExists);
             }
 
-            let item = BoundedVec::try_from(item.to_vec()).map_err(|_| StorageError::InternalError)?;
+            let item =
+                BoundedVec::try_from(item.to_vec()).map_err(|_| StorageError::InternalError)?;
             <ItemStore<T>>::insert(id, item);
 
             Ok(())
@@ -278,8 +279,9 @@ pub mod pallet {
                 return Err(StorageError::NotFound);
             }
 
-            let item = BoundedVec::try_from(item.to_vec()).map_err(|_| StorageError::InternalError)?;
-            <ItemStore<T>>::mutate(id, |a| *a = item );
+            let item =
+                BoundedVec::try_from(item.to_vec()).map_err(|_| StorageError::InternalError)?;
+            <ItemStore<T>>::mutate(id, |a| *a = item);
             Ok(())
         }
 
