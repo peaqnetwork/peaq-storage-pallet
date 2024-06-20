@@ -5,7 +5,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 pub mod enums;
-pub mod structs;
 pub mod traits;
 
 #[cfg(test)]
@@ -111,6 +110,9 @@ pub mod pallet {
 
         // Item is greater than 256
         ItemExceedMax256,
+
+        // Cannot convert
+        ItemIternalError,
     }
 
     impl<T: Config> Error<T> {
@@ -118,18 +120,18 @@ pub mod pallet {
             match err {
                 StorageError::NotFound => Err(Error::<T>::ItemNotFound.into()),
                 StorageError::AlreadyExists => Err(Error::<T>::ItemTypeAlreadyExists.into()),
+                StorageError::InternalError => Err(Error::<T>::ItemIternalError.into()),
             }
         }
     }
 
     #[pallet::pallet]
-    #[pallet::without_storage_info]
     pub struct Pallet<T>(_);
 
     #[pallet::storage]
     #[pallet::getter(fn item_of)]
     pub(super) type ItemStore<T: Config> =
-        StorageMap<_, Blake2_128Concat, [u8; 32], Vec<u8>, ValueQuery>;
+        StorageMap<_, Blake2_128Concat, [u8; 32], BoundedVec<u8, T::BoundedDataLen>, ValueQuery>;
 
     #[pallet::hooks]
     impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {}
@@ -164,7 +166,7 @@ pub mod pallet {
                 Self::deposit_amount(),
             )?;
 
-            match Self::create(&sender, &item_type, &item) {
+            match Self::create(&sender, &item_type, item.as_slice()) {
                 Ok(()) => {
                     Self::deposit_event(Event::ItemAdded(sender.clone(), item_type, item));
                 }
@@ -261,6 +263,8 @@ pub mod pallet {
                 return Err(StorageError::AlreadyExists);
             }
 
+            let item =
+                BoundedVec::try_from(item.to_vec()).map_err(|_| StorageError::InternalError)?;
             <ItemStore<T>>::insert(id, item);
 
             Ok(())
@@ -275,7 +279,9 @@ pub mod pallet {
                 return Err(StorageError::NotFound);
             }
 
-            <ItemStore<T>>::mutate(id, |a| *a = item.to_vec());
+            let item =
+                BoundedVec::try_from(item.to_vec()).map_err(|_| StorageError::InternalError)?;
+            <ItemStore<T>>::mutate(id, |a| *a = item);
             Ok(())
         }
 
@@ -284,7 +290,7 @@ pub mod pallet {
             let id = Self::get_hashed_key(owner, item_type);
 
             if <ItemStore<T>>::contains_key(id) {
-                return Some(Self::item_of(id));
+                return Some(Self::item_of(id).to_vec());
             }
             None
         }
