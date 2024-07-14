@@ -11,9 +11,6 @@ authors = { workspace = true }
 
 [dependencies]
 parity-scale-codec = { workspace = true }
-jsonrpc-core = { workspace = true }
-jsonrpc-core-client = { workspace = true }
-jsonrpc-derive = { workspace = true }
 peaq-pallet-storage-runtime-api = { path = "./runtime-api" }
 peaq-pallet-storage = { path = "../pallet/" }
 
