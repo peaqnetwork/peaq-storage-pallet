@@ -36,7 +36,7 @@ pub trait PeaqStorageApi<BlockHash, AccountId> {
         &self,
         did_account: AccountId,
         item_type: Bytes,
-        at: BlockHash,
+        at: Option<BlockHash>,
     ) -> RpcResult<Option<StorageRpcResult>>;
 }
 
@@ -81,10 +81,11 @@ where
         &self,
         did_account: AccountId,
         item_type: Bytes,
-        at: <Block as BlockT>::Hash,
+        at: Option<<Block as BlockT>::Hash>,
     ) -> RpcResult<Option<StorageRpcResult>> {
         let api = self.client.runtime_api();
-        api.read(at, did_account, item_type.to_vec())
+        let block_hash = at.unwrap_or_else(|| self.client.info().best_hash);
+        api.read(block_hash, did_account, item_type.to_vec())
             .map(|o| o.map(StorageRpcResult::from))
             .map_err(|err| internal_err(err.to_string()))
     }
