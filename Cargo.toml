@@ -9,26 +9,27 @@ publish = false
 repository = "https://github.com/peaqnetwork/peaq-pallet-storage/"
 
 [workspace.dependencies]
-hex-literal = "0.3.3"
+hex-literal = "0.3.4"
 
 parity-scale-codec = { version = "3.6.12", default-features = false }
-frame-support = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-v1.7.2" }
-frame-system = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-v1.7.2" }
-scale-info = { default-features = false, version = "2.0.1" }
-sp-runtime = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-v1.7.2" }
-sp-core = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-v1.7.2" }
-sp-io = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-v1.7.2" }
-sp-std = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-v1.7.2" }
-frame-benchmarking = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-v1.7.2" }
-sp-api = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-v1.7.2" }
-sp-blockchain = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-v1.7.2" }
-sp-rpc = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-v1.7.2" }
-pallet-balances = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-v1.7.2" }
+frame-support = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-stable2407" }
+frame-system = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-stable2407" }
+scale-info = { default-features = false, version = "2.11.3" }
+sp-runtime = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-stable2407" }
+sp-core = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-stable2407" }
+sp-io = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-stable2407" }
+sp-std = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-stable2407" }
+frame-benchmarking = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-stable2407" }
+sp-api = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-stable2407" }
+sp-blockchain = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-stable2407" }
+sp-rpc = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-stable2407" }
+pallet-balances = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "peaq-polkadot-stable2407" }
 
-serde = "1.0.136"
-jsonrpsee = { version = "0.20.3" }
+serde = "1.0.210"
+jsonrpsee = { version = "0.23.2" }
+tower = { version = "0.4.13" }
 
-serde_json = "1.0"
+serde_json = "1.0.128"
 
 [workspace]
 members = [
