@@ -1,8 +1,6 @@
 use crate as peaq_storage;
-use frame_support::{parameter_types, derive_impl};
-use sp_core::{sr25519, Pair, H256};
+use frame_support::{derive_impl, parameter_types};
 use sp_io::TestExternalities;
-use sp_runtime::traits::{BlakeTwo256, IdentityLookup};
 use sp_runtime::BuildStorage;
 
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -31,8 +29,8 @@ parameter_types! {
 
 #[derive_impl(frame_system::config_preludes::TestDefaultConfig)]
 impl frame_system::Config for Test {
-	type Block = Block;
-	type AccountData = pallet_balances::AccountData<Balance>;
+    type Block = Block;
+    type AccountData = pallet_balances::AccountData<Balance>;
 }
 
 parameter_types! {
@@ -41,9 +39,9 @@ parameter_types! {
 
 #[derive_impl(pallet_balances::config_preludes::TestDefaultConfig)]
 impl pallet_balances::Config for Test {
-	type Balance = Balance;
-	type ExistentialDeposit = ExistentialDeposit;
-	type AccountStore = System;
+    type Balance = Balance;
+    type ExistentialDeposit = ExistentialDeposit;
+    type AccountStore = System;
     type ReserveIdentifier = [u8; 8];
 }
 
@@ -69,11 +67,16 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
         .build_storage()
         .unwrap();
 
-    let balances: Vec<_> = (0..10).map(|i| (i as u64, 1_400_000_000_000_000_000_000_000_000)).collect();
+    let balances: Vec<_> = (0..10)
+        .map(|i| (i as u64, 1_400_000_000_000_000_000_000_000_000))
+        .collect();
 
-    pallet_balances::GenesisConfig::<Test> { balances, ..Default::default() }
-        .assimilate_storage(&mut storage)
-        .unwrap();
+    pallet_balances::GenesisConfig::<Test> {
+        balances,
+        ..Default::default()
+    }
+    .assimilate_storage(&mut storage)
+    .unwrap();
 
     let mut ext = TestExternalities::from(storage);
     ext.execute_with(|| System::set_block_number(1));

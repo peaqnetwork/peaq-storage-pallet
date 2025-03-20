@@ -24,7 +24,7 @@ fn add_item_test_ok() {
 
         // correct storage deposit was deducted or not
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&alice),
+            <Test as Config>::Currency::reserved_balance(alice),
             EXPECTED_DEPOSIT
         );
     });
@@ -56,7 +56,7 @@ fn add_item_duplicate_test() {
 
         // correct storage deposit was deducted or not
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&alice),
+            <Test as Config>::Currency::reserved_balance(alice),
             EXPECTED_DEPOSIT
         );
     });
@@ -81,7 +81,7 @@ fn add_item_type_length_exceeds_limit_test() {
         );
 
         // no deposit deducted
-        assert_eq!(<Test as Config>::Currency::reserved_balance(&alice), 0);
+        assert_eq!(<Test as Config>::Currency::reserved_balance(alice), 0);
     });
 }
 
@@ -104,7 +104,7 @@ fn add_item_length_exceeds_limit_test() {
         );
 
         // no deposit deducted
-        assert_eq!(<Test as Config>::Currency::reserved_balance(&alice), 0);
+        assert_eq!(<Test as Config>::Currency::reserved_balance(alice), 0);
     });
 }
 
@@ -131,7 +131,7 @@ fn update_item_test_ok() {
 
         // correct storage deposit was deducted or not
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&alice),
+            <Test as Config>::Currency::reserved_balance(alice),
             EXPECTED_DEPOSIT
         );
     });
@@ -182,7 +182,7 @@ fn update_item_with_item_length_exceed_limit_test() {
 
         // correct storage deposit was deducted or not
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&alice),
+            <Test as Config>::Currency::reserved_balance(alice),
             EXPECTED_DEPOSIT
         );
     });
@@ -204,7 +204,7 @@ fn update_other_owner_item_test() {
         ));
         // correct storage deposit was deducted or not
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&alice),
+            <Test as Config>::Currency::reserved_balance(alice),
             EXPECTED_DEPOSIT
         );
         //Update the item with fake owner
@@ -217,7 +217,7 @@ fn update_other_owner_item_test() {
             Error::<Test>::ItemNotFound
         );
         // correct storage deposit was deducted or not
-        assert_eq!(<Test as Config>::Currency::reserved_balance(&bob), 0);
+        assert_eq!(<Test as Config>::Currency::reserved_balance(bob), 0);
     });
 }
 
@@ -307,7 +307,7 @@ fn remove_item_is_ok() {
             BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&alice),
+            <Test as Config>::Currency::reserved_balance(alice),
             EXPECTED_DEPOSIT
         );
 
@@ -317,7 +317,7 @@ fn remove_item_is_ok() {
             BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap()
         ));
 
-        assert_eq!(<Test as Config>::Currency::reserved_balance(&alice), 0);
+        assert_eq!(<Test as Config>::Currency::reserved_balance(alice), 0);
     });
 }
 
@@ -335,7 +335,7 @@ fn remove_non_existing_item() {
             ),
             Error::<Test>::ItemNotFound
         );
-        assert_eq!(<Test as Config>::Currency::reserved_balance(&alice), 0);
+        assert_eq!(<Test as Config>::Currency::reserved_balance(alice), 0);
     });
 }
 
@@ -353,7 +353,7 @@ fn remove_someone_elses_item() {
             BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&alice),
+            <Test as Config>::Currency::reserved_balance(alice),
             EXPECTED_DEPOSIT
         );
 
@@ -365,6 +365,6 @@ fn remove_someone_elses_item() {
             ),
             Error::<Test>::ItemNotFound
         );
-        assert_eq!(<Test as Config>::Currency::reserved_balance(&bob), 0);
+        assert_eq!(<Test as Config>::Currency::reserved_balance(bob), 0);
     });
 }
