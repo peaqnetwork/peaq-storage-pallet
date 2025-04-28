@@ -1,7 +1,7 @@
 [workspace.package]
 authors = ["EoTLabs <info@eotlabs.io>"]
 edition = "2021"
-version = "0.2.1"
+version = "0.3.1"
 description = "peaq storage pallet and rpc interface."
 homepage = "https://peaq.network/"
 license = "Apache-2.0"

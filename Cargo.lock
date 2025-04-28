@@ -2233,7 +2233,7 @@ dependencies = [
 
 [[package]]
 name = "peaq-pallet-storage"
-version = "0.2.1"
+version = "0.3.1"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -2250,7 +2250,7 @@ dependencies = [
 
 [[package]]
 name = "peaq-pallet-storage-rpc"
-version = "0.2.1"
+version = "0.3.1"
 dependencies = [
  "jsonrpsee",
  "parity-scale-codec",
@@ -2266,7 +2266,7 @@ dependencies = [
 
 [[package]]
 name = "peaq-pallet-storage-runtime-api"
-version = "0.2.1"
+version = "0.3.1"
 dependencies = [
  "parity-scale-codec",
  "peaq-pallet-storage",
