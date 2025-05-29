@@ -12,18 +12,18 @@ repository = "https://github.com/peaqnetwork/peaq-pallet-storage/"
 hex-literal = "0.3.3"
 
 parity-scale-codec = { version = "3.6.12", default-features = false }
-frame-support = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-improvement-v01" }
-frame-system = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-improvement-v01" }
+frame-support = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-pool-issue" }
+frame-system = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-pool-issue" }
 scale-info = { default-features = false, version = "2.0.1" }
-sp-runtime = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-improvement-v01" }
-sp-core = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-improvement-v01" }
-sp-io = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-improvement-v01" }
-sp-std = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-improvement-v01" }
-frame-benchmarking = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-improvement-v01" }
-sp-api = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-improvement-v01" }
-sp-blockchain = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-improvement-v01" }
-sp-rpc = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-improvement-v01" }
-pallet-balances = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-improvement-v01" }
+sp-runtime = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-pool-issue" }
+sp-core = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-pool-issue" }
+sp-io = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-pool-issue" }
+sp-std = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-pool-issue" }
+frame-benchmarking = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-pool-issue" }
+sp-api = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-pool-issue" }
+sp-blockchain = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-pool-issue" }
+sp-rpc = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-pool-issue" }
+pallet-balances = { default-features = false, git = "https://github.com/peaqnetwork/polkadot-sdk", branch = "release-pool-issue" }
 
 serde = "1.0.136"
 jsonrpsee = { version = "0.20.3" }
