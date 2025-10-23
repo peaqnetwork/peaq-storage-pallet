@@ -13,7 +13,7 @@ pub(crate) const EXPECTED_DEPOSIT: Balance =
 #[test]
 fn add_item_test_ok() {
     new_test_ext().execute_with(|| {
-        let alice: AccountId = account_key("Iredia1");
+        let alice: u64 = 1;
         System::set_block_number(1);
 
         assert_ok!(PeaqStorage::add_item(
@@ -24,7 +24,7 @@ fn add_item_test_ok() {
 
         // correct storage deposit was deducted or not
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&alice),
+            <Test as Config>::Currency::reserved_balance(alice),
             EXPECTED_DEPOSIT
         );
     });
@@ -34,7 +34,7 @@ fn add_item_test_ok() {
 #[test]
 fn add_item_duplicate_test() {
     new_test_ext().execute_with(|| {
-        let alice: AccountId = account_key("Iredia1");
+        let alice: u64 = 1;
         System::set_block_number(1);
 
         //Add an item
@@ -56,7 +56,7 @@ fn add_item_duplicate_test() {
 
         // correct storage deposit was deducted or not
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&alice),
+            <Test as Config>::Currency::reserved_balance(alice),
             EXPECTED_DEPOSIT
         );
     });
@@ -66,7 +66,7 @@ fn add_item_duplicate_test() {
 #[test]
 fn add_item_type_length_exceeds_limit_test() {
     new_test_ext().execute_with(|| {
-        let alice: AccountId = account_key("Iredia1");
+        let alice: u64 = 1;
         System::set_block_number(1);
 
         let invalid_item_typ = ITEM_TYPE.repeat(9);
@@ -81,7 +81,7 @@ fn add_item_type_length_exceeds_limit_test() {
         );
 
         // no deposit deducted
-        assert_eq!(<Test as Config>::Currency::reserved_balance(&alice), 0);
+        assert_eq!(<Test as Config>::Currency::reserved_balance(alice), 0);
     });
 }
 
@@ -89,7 +89,7 @@ fn add_item_type_length_exceeds_limit_test() {
 #[test]
 fn add_item_length_exceeds_limit_test() {
     new_test_ext().execute_with(|| {
-        let alice: AccountId = account_key("Iredia1");
+        let alice: u64 = 1;
         System::set_block_number(1);
 
         let invalid_item = ITEM.repeat(66);
@@ -104,7 +104,7 @@ fn add_item_length_exceeds_limit_test() {
         );
 
         // no deposit deducted
-        assert_eq!(<Test as Config>::Currency::reserved_balance(&alice), 0);
+        assert_eq!(<Test as Config>::Currency::reserved_balance(alice), 0);
     });
 }
 
@@ -112,7 +112,7 @@ fn add_item_length_exceeds_limit_test() {
 #[test]
 fn update_item_test_ok() {
     new_test_ext().execute_with(|| {
-        let alice: AccountId = account_key("Iredia1");
+        let alice: u64 = 1;
         System::set_block_number(1);
 
         //Add an item
@@ -131,7 +131,7 @@ fn update_item_test_ok() {
 
         // correct storage deposit was deducted or not
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&alice),
+            <Test as Config>::Currency::reserved_balance(alice),
             EXPECTED_DEPOSIT
         );
     });
@@ -141,7 +141,7 @@ fn update_item_test_ok() {
 #[test]
 fn update_non_existing_item_test() {
     new_test_ext().execute_with(|| {
-        let alice: AccountId = account_key("Iredia1");
+        let alice: u64 = 1;
         System::set_block_number(1);
 
         assert_noop!(
@@ -158,7 +158,7 @@ fn update_non_existing_item_test() {
 #[test]
 fn update_item_with_item_length_exceed_limit_test() {
     new_test_ext().execute_with(|| {
-        let alice: AccountId = account_key("Iredia1");
+        let alice: u64 = 1;
         System::set_block_number(1);
 
         let invalid_item = ITEM.repeat(66);
@@ -182,7 +182,7 @@ fn update_item_with_item_length_exceed_limit_test() {
 
         // correct storage deposit was deducted or not
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&alice),
+            <Test as Config>::Currency::reserved_balance(alice),
             EXPECTED_DEPOSIT
         );
     });
@@ -192,8 +192,8 @@ fn update_item_with_item_length_exceed_limit_test() {
 //Test to update an other owner's item
 fn update_other_owner_item_test() {
     new_test_ext().execute_with(|| {
-        let alice: AccountId = account_key("Iredia1");
-        let bob: AccountId = account_key("Iredia2");
+        let alice: u64 = 1;
+        let bob: u64 = 2;
         System::set_block_number(1);
 
         //Add an item with user Iredia
@@ -204,7 +204,7 @@ fn update_other_owner_item_test() {
         ));
         // correct storage deposit was deducted or not
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&alice),
+            <Test as Config>::Currency::reserved_balance(alice),
             EXPECTED_DEPOSIT
         );
         //Update the item with fake owner
@@ -217,7 +217,7 @@ fn update_other_owner_item_test() {
             Error::<Test>::ItemNotFound
         );
         // correct storage deposit was deducted or not
-        assert_eq!(<Test as Config>::Currency::reserved_balance(&bob), 0);
+        assert_eq!(<Test as Config>::Currency::reserved_balance(bob), 0);
     });
 }
 
@@ -225,7 +225,7 @@ fn update_other_owner_item_test() {
 #[test]
 fn get_item_test_ok() {
     new_test_ext().execute_with(|| {
-        let alice: AccountId = account_key("Iredia1");
+        let alice: u64 = 1;
         System::set_block_number(1);
 
         //Add an item
@@ -247,7 +247,7 @@ fn get_item_test_ok() {
 #[test]
 fn get_non_existing_item_test() {
     new_test_ext().execute_with(|| {
-        let alice: AccountId = account_key("Iredia1");
+        let alice: u64 = 1;
         System::set_block_number(1);
 
         assert_ok!(PeaqStorage::add_item(
@@ -271,8 +271,8 @@ fn get_non_existing_item_test() {
 #[test]
 fn get_other_owner_item_test() {
     new_test_ext().execute_with(|| {
-        let alice: AccountId = account_key("Iredia1");
-        let bob: AccountId = account_key("Iredia2");
+        let alice: u64 = 1;
+        let bob: u64 = 2;
 
         System::set_block_number(1);
 
@@ -297,7 +297,7 @@ fn get_other_owner_item_test() {
 #[test]
 fn remove_item_is_ok() {
     new_test_ext().execute_with(|| {
-        let alice: AccountId = account_key("Iredia1");
+        let alice: u64 = 1;
         System::set_block_number(1);
 
         //Add an item
@@ -307,7 +307,7 @@ fn remove_item_is_ok() {
             BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&alice),
+            <Test as Config>::Currency::reserved_balance(alice),
             EXPECTED_DEPOSIT
         );
 
@@ -317,14 +317,14 @@ fn remove_item_is_ok() {
             BoundedVec::try_from(ITEM_TYPE.to_vec()).unwrap()
         ));
 
-        assert_eq!(<Test as Config>::Currency::reserved_balance(&alice), 0);
+        assert_eq!(<Test as Config>::Currency::reserved_balance(alice), 0);
     });
 }
 
 #[test]
 fn remove_non_existing_item() {
     new_test_ext().execute_with(|| {
-        let alice: AccountId = account_key("Iredia1");
+        let alice: u64 = 1;
         System::set_block_number(1);
 
         //Remove the item
@@ -335,15 +335,15 @@ fn remove_non_existing_item() {
             ),
             Error::<Test>::ItemNotFound
         );
-        assert_eq!(<Test as Config>::Currency::reserved_balance(&alice), 0);
+        assert_eq!(<Test as Config>::Currency::reserved_balance(alice), 0);
     });
 }
 
 #[test]
 fn remove_someone_elses_item() {
     new_test_ext().execute_with(|| {
-        let alice: AccountId = account_key("Iredia1");
-        let bob: AccountId = account_key("Iredia2");
+        let alice: u64 = 1;
+        let bob: u64 = 2;
         System::set_block_number(1);
 
         //Add an item
@@ -353,7 +353,7 @@ fn remove_someone_elses_item() {
             BoundedVec::try_from(ITEM.to_vec()).unwrap()
         ));
         assert_eq!(
-            <Test as Config>::Currency::reserved_balance(&alice),
+            <Test as Config>::Currency::reserved_balance(alice),
             EXPECTED_DEPOSIT
         );
 
@@ -365,6 +365,6 @@ fn remove_someone_elses_item() {
             ),
             Error::<Test>::ItemNotFound
         );
-        assert_eq!(<Test as Config>::Currency::reserved_balance(&bob), 0);
+        assert_eq!(<Test as Config>::Currency::reserved_balance(bob), 0);
     });
 }
